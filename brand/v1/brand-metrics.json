@@ -1,0 +1,52 @@
+{
+  "source": {
+    "file": "edura-logo-source.jpg",
+    "inkBBox": [
+      69,
+      115,
+      620,
+      277
+    ],
+    "markWordGap": 6
+  },
+  "colors": {
+    "navy": "#102A56",
+    "primary": "#2563EB",
+    "light": "#60A5FA",
+    "veryLight": "#EFF6FF",
+    "warmWhite": "#FAFBFC",
+    "graphite": "#172033"
+  },
+  "mark": {
+    "viewBox": [
+      102,
+      158
+    ],
+    "aspect": 0.6456,
+    "vector": "traced from the supplied artwork (scripts/brand_vectorize.py)"
+  },
+  "wordmark": {
+    "font": "Manrope",
+    "weight": 800,
+    "text": "EDURA",
+    "capHeightOverMarkHeight": 0.5316,
+    "inkAspect": 4.5833,
+    "letterWidthsSource1x": [
+      55,
+      67,
+      67,
+      63,
+      79
+    ]
+  },
+  "lockup": {
+    "viewBox": [
+      551.0,
+      158
+    ],
+    "aspect": 3.4873,
+    "wordX": 166,
+    "wordTop": 39,
+    "gapFromMarkInk": 64
+  }
+}

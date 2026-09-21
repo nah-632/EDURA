@@ -1,0 +1,16 @@
+{
+  "horizontal": {
+    "markTransform": "translate(0 0)",
+    "wordTransform": "translate(2182.700 586.679)",
+    "width": 3966.826,
+    "height": 1531.0
+  },
+  "stacked": {
+    "markTransform": "translate(52.563 0)",
+    "wordTransform": "translate(0.000 2632.708)",
+    "width": 1784.126,
+    "height": 2632.708
+  },
+  "wordmarkAspect": 4.9886,
+  "markAspect": 1.0967
+}

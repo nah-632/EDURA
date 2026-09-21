@@ -1,0 +1,43 @@
+{
+  "files": 11,
+  "public": {
+    "brand": [
+      "icon.svg",
+      "icons",
+      "logo",
+      "og-image.png",
+      "photo"
+    ],
+    "icons": [
+      "apple-touch-icon-180.png",
+      "apple-touch-icon.png",
+      "favicon-16.png",
+      "favicon-192.png",
+      "favicon-32.png",
+      "favicon-48.png",
+      "favicon-512.png",
+      "favicon-96.png",
+      "favicon.ico",
+      "icon.svg",
+      "maskable-512.png"
+    ],
+    "logo": [
+      "edura-app-icon-reverse.svg",
+      "edura-app-icon.svg",
+      "edura-app-maskable.svg",
+      "edura-logo-horizontal-mono.svg",
+      "edura-logo-horizontal-reverse.svg",
+      "edura-logo-horizontal.svg",
+      "edura-logo-signature-ar.svg",
+      "edura-logo-signature.svg",
+      "edura-logo-stacked-mono.svg",
+      "edura-logo-stacked-reverse.svg",
+      "edura-logo-stacked.svg",
+      "edura-logo-wordmark.svg",
+      "edura-mark-mono.svg",
+      "edura-mark.svg",
+      "edura-og.svg"
+    ]
+  },
+  "iconSize": 23837
+}

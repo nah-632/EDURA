@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js build output
+.next/
+out/
+.tmp-*/
+.tmp-check/
+.tmp-tests/
+
+# Environment: never commit a value
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Logs and OS noise
+*.log
+npm-debug.log*
+.DS_Store
+*.pem
+
+# Editor
+.vscode/
+.idea/

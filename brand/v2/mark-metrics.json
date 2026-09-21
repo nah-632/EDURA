@@ -1,0 +1,31 @@
+{
+  "source": "photo_0924F36D.jpeg",
+  "crop": [
+    562,
+    92,
+    892,
+    386
+  ],
+  "upscale": 8,
+  "viewBox": "0 0 1665 1531",
+  "box": [
+    1665,
+    1531
+  ],
+  "aspect": 1.0875,
+  "palette": {
+    "turquoise": "#3F9DA5",
+    "terracotta": "#BF6743",
+    "sand": "#D7C097",
+    "paper": "#F7F2E8"
+  },
+  "paths": {
+    "turquoise": 2,
+    "terracotta": 2,
+    "sand": 1
+  },
+  "bytes": {
+    "edura-mark.svg": 13281,
+    "edura-mark-mono.svg": 13055
+  }
+}

@@ -1,0 +1,55 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Secrets — never committed. The local ones live in app/.env.local and
+# secrets/; deployments get them from the hosting provider's environment.
+# ─────────────────────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.production
+secrets/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Dependencies
+# NOTE: no trailing slash on purpose. `app/node_modules` is a SYMLINK in this
+# workspace, and gitignore's `node_modules/` (trailing slash) only matches real
+# directories — the symlink would have been committed, pointing at /tmp.
+# ─────────────────────────────────────────────────────────────────────────────
+node_modules
+.pnp
+.pnp.js
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Build output and caches
+# ─────────────────────────────────────────────────────────────────────────────
+.next/
+out/
+dist/
+# Every `scripts/check-*.mjs` writes a scratch dir; the wildcard covers the
+# ones that were missed (`check-imports` and `check-client` between them had
+# committed 254 generated .js files, ~9 MB of build output).
+.tmp-*/
+.tmp-check/
+.tmp-tests/
+.tmp-css/
+*.tsbuildinfo
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Generated brand working files (the SVGs in brand/v2 ARE committed; the
+# intermediate masks and traces that produced them are not).
+# ─────────────────────────────────────────────────────────────────────────────
+brand/v2/work/
+brand/v2/incoming/
+assets-build/fonts-v1/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Logs, OS and editor noise
+# ─────────────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+.DS_Store
+*.pem
+.vscode/
+.idea/
+
+# Vercel
+.vercel

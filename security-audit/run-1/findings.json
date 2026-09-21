@@ -1,0 +1,482 @@
+[
+  {
+    "verdict": "confirmed",
+    "title": "IDOR: booking idempotency key resolved across accounts, disclosing another customer's booking",
+    "description": "POST /api/bookings accepts a client-supplied `idempotencyKey`. Before creating anything, the engine called `store.findByIdempotencyKey(key)` and returned the matching booking as if the caller had just created it. The lookup was scoped by key VALUE only, and the key the shipped UI derives is fully predictable from public data: `${tutor.id}:${date}:${time}:${duration}`. Any authenticated user could therefore send a booking request carrying a key formed from a tutor's public id, a date and a time; if that slot had been booked by somebody else, the response was that person's booking object — `id`, `code` (which is also the BenefitPay payment reference), `price` and `status` — with HTTP 200 and no ownership check anywhere on that path (the ownership check in the engine runs later, and the early return skips it). The same request also returned a WhatsApp deep link for the caller, reinforcing the false impression that the booking was theirs. Enumerating tutor × date × time discloses bookings and reveals which slots are taken.",
+    "root_cause": "findByIdempotencyKey in src/lib/booking/sqlStore.ts does not scope the lookup by the requesting customer, allowing any caller who can construct the key to read another account's booking back out of the API.",
+    "intended_behavior": "An idempotency key exists so a double-tapped submit button cannot create two identical bookings. The key is a per-attempt marker belonging to one customer; resolving it must only ever be able to return THAT customer's booking, and an unknown key must create a new booking instead of disclosing an existing one.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "src/app/api/bookings/route.ts",
+        "line": 45,
+        "scope": "POST",
+        "description": "Authenticated customer submits a booking request body containing idempotencyKey, tutorId, date and time."
+      },
+      {
+        "kind": "propagation",
+        "file": "src/lib/booking/engine.ts",
+        "line": 153,
+        "scope": "createBookingRequest",
+        "description": "The engine short-circuits on the idempotency key before any authorization or ownership work, and returns the stored row as the caller's booking."
+      },
+      {
+        "kind": "propagation",
+        "file": "src/lib/booking/sqlStore.ts",
+        "line": 126,
+        "scope": "findByIdempotencyKey",
+        "description": "The lookup matched `where idempotency_key = $1` with no customer filter, so a foreign key resolved to another account's booking."
+      },
+      {
+        "kind": "sink",
+        "file": "src/app/api/bookings/route.ts",
+        "line": 188,
+        "scope": "POST",
+        "description": "The route serialised the foreign booking (code, amount, status) plus a WhatsApp link into the 200 response."
+      }
+    ],
+    "conditions": [
+      {
+        "kind": "authentication_level",
+        "description": "Any authenticated account (registration is free and self-service)."
+      },
+      {
+        "kind": "data_state",
+        "description": "The target slot must already have been booked by another customer using the same derived key."
+      }
+    ],
+    "execution": {
+      "attacker_perspective": "A registered user with no special role, browsing the public tutor directory.",
+      "payloads": [
+        "POST /api/bookings {\"tutorId\":\"<public tutor id>\",\"studentId\":\"<own student>\",\"subjectCode\":\"math\",\"lessonTypeCode\":\"private\",\"method\":\"online\",\"date\":\"2026-10-01\",\"time\":\"17:00\",\"durationMinutes\":60,\"acceptTerms\":true,\"idempotencyKey\":\"<tutor id>:2026-10-01:17:00:60\"}"
+      ],
+      "instructions": [
+        "Register a free account and sign in (the session cookie is all that is needed).",
+        "Open any tutor profile and read the tutor id from the booking form / page payload.",
+        "Pick a date and time the tutor appears to be available for.",
+        "Submit a booking request whose idempotencyKey is the predictable tuple `<tutor id>:<date>:<time>:<duration>`.",
+        "Read the response: if that slot belongs to another customer, the response contains their booking code, price and status."
+      ],
+      "expected_result": "HTTP 200 with `booking.code`, `booking.amount` and `booking.status` belonging to a different account (and no new booking created for the caller)."
+    },
+    "remediation": {
+      "strategy": "Three layers, all applied: (1) the idempotency lookup is scoped by the requesting customer in SQL, so a foreign key can never resolve; (2) the client's key now carries an unguessable random suffix, so it cannot be constructed by anyone else even if a lookup were ever unscoped again; (3) a regression test pins the behaviour down, asserting that the same key from a second account creates a new booking rather than returning the first one.",
+      "code_changes": [
+        {
+          "file_name": "src/lib/booking/sqlStore.ts",
+          "fixed_code": "async findByIdempotencyKey(key: string, customerUserId: string): Promise<BookingRow | null> {\n  const rows = await query<{ id: string; code: string; status: BookingStatus; price: string }>(\n    `select id, code, status, price from bookings\n      where idempotency_key = $1 and customer_user_id = $2\n      limit 1`,\n    [key, customerUserId],\n  );\n  const row = rows[0];\n  return row ? { id: row.id, code: row.code, status: row.status, price: row.price } : null;\n}"
+        },
+        {
+          "file_name": "src/components/booking/BookingStepper.tsx",
+          "fixed_code": "idempotencyKey: `${tutor.id}:${date}:${time}:${duration}:${submissionKey}`,"
+        },
+        {
+          "file_name": "src/lib/booking/engine.ts",
+          "fixed_code": "const existing = await store.findByIdempotencyKey(request.idempotencyKey, request.customerUserId);"
+        }
+      ]
+    },
+    "severity": {
+      "likelihood": {
+        "score": "high",
+        "reason": "The key was derived from public data and the endpoint needs only a free account; enumeration is mechanical."
+      },
+      "impact": {
+        "score": "medium",
+        "reason": "Discloses another customer's booking reference (also their payment reference), amount and status, and reveals slot occupancy. No PII, no write access to the victim's records."
+      },
+      "overall_severity": "high"
+    },
+    "confidence": {
+      "score": "high",
+      "reason": "The code path is short and fully readable; the fix is verified by an executable regression test that fails against the previous behaviour."
+    }
+  },
+  {
+    "verdict": "confirmed",
+    "title": "Privilege escalation: an admin-primary_role account was granted super_admin whenever its role rows lacked \"admin\"",
+    "description": "loadSession() resolved permissions from the RBAC tables, then added an implicit `super_admin` when the account's `primary_role` was 'admin' and the resolved role codes did not contain 'admin' or 'super_admin'. The stated intent was to let the first administrator (created before any role row existed) sign in. The actual condition also fired for deliberately scoped accounts: an operator who granted the `support` or `moderator` role to an account whose `primary_role` is 'admin' produced a session with ALL 26 permissions, including role.manage, settings.manage and payment.refund — the exact opposite of scoping. Because every guard in the console and the API reads `session.permissions`, the escalation silently defeated the RBAC model rather than being caught by it.",
+    "root_cause": "loadSession in src/lib/auth/service.ts does not require the absence of role rows before implying super_admin, allowing a scoped admin account to receive every permission.",
+    "intended_behavior": "The RBAC tables are the authority for an account that has role rows; the implicit super_admin exists only as a bootstrap accommodation for an administrator who has no role rows at all (the first account, before anyone could grant anything).",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "src/app/api/auth/route.ts",
+        "line": 131,
+        "scope": "POST",
+        "description": "An admin-primary_role account signs in with password + TOTP; a session cookie is issued."
+      },
+      {
+        "kind": "propagation",
+        "file": "src/lib/auth/service.ts",
+        "line": 237,
+        "scope": "loadSession",
+        "description": "Every subsequent request loads the session and derives the permission set from the RBAC rows."
+      },
+      {
+        "kind": "propagation",
+        "file": "src/lib/auth/service.ts",
+        "line": 265,
+        "scope": "loadSession",
+        "description": "The former condition pushed super_admin whenever the resolved codes merely lacked 'admin', regardless of which roles the account actually held."
+      },
+      {
+        "kind": "sink",
+        "file": "src/lib/admin/guard.ts",
+        "line": 83,
+        "scope": "requireAdminApi",
+        "description": "The guard authorized the request against the escalated permission set, so role.manage and every other permission were granted."
+      }
+    ],
+    "conditions": [
+      {
+        "kind": "authorization_role",
+        "description": "Requires an account whose primary_role is 'admin' but whose granted role rows exclude 'admin'/'super_admin' — i.e. a mis-scoped operator account, which is exactly the state the fix must not tolerate."
+      }
+    ],
+    "execution": {
+      "attacker_perspective": "An operator account intended to be limited (for example, support staff tagged as admin in primary_role).",
+      "payloads": [
+        "POST /api/admin/settings  (a settings.manage call the support role must not be able to make)"
+      ],
+      "instructions": [
+        "Sign in as the scoped account (its own password and TOTP code).",
+        "Call any admin endpoint that the assigned role does not include — for example PATCH the platform settings.",
+        "Observe that the call is authorized instead of returning 403."
+      ],
+      "expected_result": "The scoped role performed an action reserved for super_admin."
+    },
+    "remediation": {
+      "strategy": "Narrow the bootstrap accommodation to its actual purpose: the implicit super_admin is granted only when the account has NO role rows at all. Once any role row exists, the RBAC tables decide, and a scoped account stays scoped.",
+      "code_changes": [
+        {
+          "file_name": "src/lib/auth/service.ts",
+          "fixed_code": "if (row.primaryRole === \"admin\" && roleCodes.length === 0) {\n  roleCodes.push(\"super_admin\");\n}"
+        }
+      ]
+    },
+    "severity": {
+      "likelihood": {
+        "score": "medium",
+        "reason": "Requires an account that is mis-scoped in a specific way; it does not require attacker-controlled input, and it cannot be reached by a customer account."
+      },
+      "impact": {
+        "score": "high",
+        "reason": "Full administrative permissions including role management, settings and refunds — a complete defeat of the permission model for that account."
+      },
+      "overall_severity": "medium"
+    },
+    "confidence": {
+      "score": "high",
+      "reason": "The condition and its consumers are both fully visible in the audited source; the RBAC test suite now asserts the matrix independently."
+    }
+  },
+  {
+    "verdict": "confirmed",
+    "title": "Irreversible account deletion authorized by a session alone (no re-authentication)",
+    "description": "POST /api/me {action:'delete_account'} anonymised the profile, cleared student records, deleted notifications, revoked sessions and flagged the account deleted, gated only by a session cookie and a literal confirmation word the client itself supplies. Password change in the same route DID require the current password, so the inconsistency was local: the destructive action was the weaker one. Anyone holding a live session — a shared or borrowed device, a session token exfiltrated by another bug, a hostile browser extension on a logged-in phone — could destroy the family's account and its student data without knowing the password.",
+    "root_cause": "deleteOwnAccount in src/lib/account/service.ts does not verify a credential before anonymising and disabling the account, allowing a stolen or shared session to perform an irreversible deletion.",
+    "intended_behavior": "Account deletion is irreversible and destroys personal data; like a password change, it must be authorized by proving possession of the credential, not merely by presenting a session.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "src/app/api/me/route.ts",
+        "line": 35,
+        "scope": "POST",
+        "description": "The request body selects action 'delete_account' with the literal confirmation word."
+      },
+      {
+        "kind": "propagation",
+        "file": "src/app/api/me/route.ts",
+        "line": 111,
+        "scope": "POST",
+        "description": "After a session load and a rate-limit check, the handler called deleteOwnAccount with the session user id only."
+      },
+      {
+        "kind": "sink",
+        "file": "src/lib/account/service.ts",
+        "line": 222,
+        "scope": "deleteOwnAccount",
+        "description": "The account was flagged deleted, PII anonymised, student rows scrubbed and every session revoked."
+      }
+    ],
+    "conditions": [
+      {
+        "kind": "authentication_level",
+        "description": "Any valid session cookie for the target account (no password or TOTP required by the endpoint)."
+      }
+    ],
+    "execution": {
+      "attacker_perspective": "Someone with access to a signed-in browser profile or a stolen session token.",
+      "payloads": [
+        "POST /api/me {\"action\":\"delete_account\",\"confirm\":\"delete\"}"
+      ],
+      "instructions": [
+        "Obtain a live session cookie for the victim account.",
+        "Send the deletion request.",
+        "Observe that the account is anonymised, the sessions revoked and the student records scrubbed."
+      ],
+      "expected_result": "The victim's account and student data are destroyed with no credential challenge."
+    },
+    "remediation": {
+      "strategy": "Require the current password in the deletion request and verify it against the stored scrypt hash before any row is touched; a bad password returns 401 and changes nothing. The confirmation word stays as an additional speed bump.",
+      "code_changes": [
+        {
+          "file_name": "src/lib/account/service.ts",
+          "fixed_code": "const credential = await query<{ password_hash: string }>(\n  `select password_hash from users where id = $1 and deleted_at is null`,\n  [userId],\n);\nif (!credential[0] || !(await verifyPassword(password, credential[0].password_hash))) {\n  throw new Error(\"wrong_password\");\n}"
+        },
+        {
+          "file_name": "src/app/api/me/route.ts",
+          "fixed_code": "z.object({ action: z.literal(\"delete_account\"), confirm: z.literal(\"delete\"), password: z.string().min(1).max(200) })"
+        }
+      ]
+    },
+    "severity": {
+      "likelihood": {
+        "score": "low",
+        "reason": "Requires possession of a live session; no remote bypass is described."
+      },
+      "impact": {
+        "score": "high",
+        "reason": "Irreversible: personal data and student records are anonymised and the account is disabled. Recovery is manual and partial."
+      },
+      "overall_severity": "medium"
+    },
+    "confidence": {
+      "score": "high",
+      "reason": "Single request path, no indirection; the missing check is visible by comparing it with the password-change handler in the same route."
+    }
+  },
+  {
+    "verdict": "confirmed",
+    "title": "Login rate limit keyed only by (client address, email) allowed cross-account credential stuffing",
+    "description": "The login budget was consumed under a composite bucket `login:<ip>:<email>`, ten attempts per five minutes. Because the bucket changes as soon as the email changes, one machine could try ten passwords against each of unlimited accounts without ever exhausting a budget: the per-account protection existed, the per-attacker protection did not. The admin console is the highest-value target on the platform, and the only backstop behind it was the account lockout (five failures per ACCOUNT), which an attacker can simply avoid by never using the same account twice in a run.",
+    "root_cause": "the login branch of POST in src/app/api/auth/route.ts does not apply a per-address budget before the per-(address,email) budget, allowing an attacker to reset the limit by rotating the email address.",
+    "intended_behavior": "Authentication is explicitly named in the brief as requiring rate limiting. The limit should bound what one client can consume per unit time, independent of which account it is pointed at, in addition to the per-account budget that already existed.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "src/app/api/auth/route.ts",
+        "line": 60,
+        "scope": "POST",
+        "description": "An unauthenticated client posts action 'login' with an arbitrary email and password."
+      },
+      {
+        "kind": "propagation",
+        "file": "src/app/api/auth/route.ts",
+        "line": 69,
+        "scope": "POST",
+        "description": "The bucket key was derived from the client address AND the submitted email, so a new email produced a fresh budget."
+      },
+      {
+        "kind": "sink",
+        "file": "src/lib/security/ratelimit.ts",
+        "line": 52,
+        "scope": "DbRateLimiter.hit",
+        "description": "The counter for the new bucket started at one, and the attempt proceeded to password verification."
+      }
+    ],
+    "conditions": [
+      {
+        "kind": "network_routing",
+        "description": "The client address must be stable (a single origin), which is the normal case for credential stuffing."
+      }
+    ],
+    "execution": {
+      "attacker_perspective": "An unauthenticated attacker on a single host with a list of Bahraini email addresses.",
+      "payloads": [
+        "POST /api/auth {\"action\":\"login\",\"payload\":{\"email\":\"target<N>@example.bh\",\"password\":\"Guess#1234\"}}"
+      ],
+      "instructions": [
+        "Send ten login attempts for account A (budget consumed for that bucket only).",
+        "Switch to account B; send ten more; repeat across the list.",
+        "Observe that no request is rejected with rate_limited."
+      ],
+      "expected_result": "Every account can be attacked with a fresh allowance of ten attempts, indefinitely, from one address."
+    },
+    "remediation": {
+      "strategy": "Add a second, address-only budget for logins (40 per five minutes) applied before the composite bucket, so rotating the email no longer multiplies the allowance. Both budgets live in the database, so they hold across serverless instances.",
+      "code_changes": [
+        {
+          "file_name": "src/lib/security/ratelimit.ts",
+          "fixed_code": "loginPerIp: { limit: 40, windowSeconds: 300 },"
+        },
+        {
+          "file_name": "src/app/api/auth/route.ts",
+          "fixed_code": "if (scope === \"login\") {\n  const perIp = await limiter.hit(bucketKey(\"loginPerIp\", ip), LIMITS.loginPerIp.limit, LIMITS.loginPerIp.windowSeconds);\n  if (!perIp.allowed) return apiError(\"rate_limited\", 429);\n}"
+        }
+      ]
+    },
+    "severity": {
+      "likelihood": {
+        "score": "high",
+        "reason": "Trivial to execute; no special access, no timing requirement."
+      },
+      "impact": {
+        "score": "medium",
+        "reason": "Enables credential stuffing against every account including administrators; the success rate depends on password quality (the policy requires 10+ chars with mixed case and a digit)."
+      },
+      "overall_severity": "medium"
+    },
+    "confidence": {
+      "score": "high",
+      "reason": "The bucket composition is explicit in the source and the effect follows directly from it."
+    }
+  },
+  {
+    "verdict": "confirmed",
+    "title": "Verified payment left a paid booking unrecoverable when the follow-up status change failed",
+    "description": "verifyPayment() first marked the payment row verified and then advanced the booking (payment_verification -> paid) through a second, separate transaction. If that second step failed — a transient database error, a lock, a cancelled request — the payment stayed verified while the booking stayed unadvanced, and the operator's only remedy was the same button, which answered 409 `already_done` because the payment was already verified. The customer had paid, the money record said so, and the console refused to finish the job.",
+    "root_cause": "verifyPayment in src/lib/admin/actions.ts refuses to run when the payment row is already verified, allowing a partially completed verification to block its own recovery.",
+    "intended_behavior": "Verification is idempotent: pressing the button again must complete any step that did not complete, and must not double-apply anything (the state machine already refuses illegal transitions, and re-marking a verified payment is a no-op).",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "src/app/api/admin/payments/route.ts",
+        "line": 54,
+        "scope": "POST",
+        "description": "An admin with payment.verify posts action 'verify' for a submitted payment."
+      },
+      {
+        "kind": "propagation",
+        "file": "src/lib/admin/actions.ts",
+        "line": 493,
+        "scope": "verifyPayment",
+        "description": "The payment row is marked verified by the provider, committing independently of the booking follow-up."
+      },
+      {
+        "kind": "sink",
+        "file": "src/lib/admin/actions.ts",
+        "line": 518,
+        "scope": "verifyPayment",
+        "description": "On a retry after a failed follow-up, the early return raised already_done instead of completing the booking transition."
+      }
+    ],
+    "conditions": [
+      {
+        "kind": "timing_dependency",
+        "description": "Requires the follow-up status change to fail after the payment row was committed (transient database or lock failure)."
+      },
+      {
+        "kind": "authorization_role",
+        "description": "The retry is performed by an admin holding payment.verify."
+      }
+    ],
+    "execution": {
+      "attacker_perspective": "Not attacker-facing; this is an operational integrity defect. Reproducible by interrupting the request between the two writes.",
+      "payloads": [
+        "POST /api/admin/payments {\"action\":\"verify\",\"paymentId\":\"<id>\"}  (sent twice)"
+      ],
+      "instructions": [
+        "Verify a payment whose booking transition then fails (e.g. terminate the connection after the first write, or take the DB briefly unavailable).",
+        "Observe: payments.status = verified, bookings.status = payment_verification.",
+        "Press verify again: the API answers 409 already_done and the booking can never reach `paid` through this path."
+      ],
+      "expected_result": "A paid booking is stuck in payment_verification with no console remedy."
+    },
+    "remediation": {
+      "strategy": "Make verification idempotent: skip re-confirming the payment row when it is already verified, but always run the booking/subscription follow-up. The state machine still refuses illegal transitions, so this cannot double-apply a status change.",
+      "code_changes": [
+        {
+          "file_name": "src/lib/admin/actions.ts",
+          "fixed_code": "if (payment.status !== \"verified\") {\n  await paymentProvider().confirmManually(payment.id, ctx.actorUserId, params.reference ?? undefined);\n}"
+        }
+      ]
+    },
+    "severity": {
+      "likelihood": {
+        "score": "medium",
+        "reason": "Depends on a transient failure at one specific moment, but that moment is a normal one under load or a connection reset."
+      },
+      "impact": {
+        "score": "medium",
+        "reason": "A customer's paid booking cannot be confirmed without manual database surgery; the money record and the booking disagree."
+      },
+      "overall_severity": "medium"
+    },
+    "confidence": {
+      "score": "high",
+      "reason": "Two sequential writes followed by an early-return guard on the first one; the failure mode is deterministic once the first write succeeds alone."
+    }
+  },
+  {
+    "verdict": "confirmed",
+    "title": "Partial profile update erased the stored display name",
+    "description": "updateOwnProfile wrote `display_name = $3` unconditionally in its ON CONFLICT branch. The profile form sends only the fields the customer edited, so submitting the form that changes the full name (without a display name) wrote NULL over an existing display name, silently losing data the customer had entered. The same statement would have overwritten the preferred locale in the same way had the form ever omitted it.",
+    "root_cause": "updateOwnProfile in src/lib/account/service.ts does not distinguish between 'field omitted' and 'field set to empty', allowing a partial update to null out columns that were never part of the request.",
+    "intended_behavior": "A partial update touches only the fields present in the request; an omitted field keeps its stored value (that is what the nullable optional inputs in the schema already imply).",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "src/app/api/me/route.ts",
+        "line": 43,
+        "scope": "POST",
+        "description": "The customer submits action 'update_profile' with only fullName set."
+      },
+      {
+        "kind": "propagation",
+        "file": "src/lib/account/service.ts",
+        "line": 90,
+        "scope": "updateOwnProfile",
+        "description": "The upsert ran whenever any of the three fields was present."
+      },
+      {
+        "kind": "sink",
+        "file": "src/lib/account/service.ts",
+        "line": 108,
+        "scope": "updateOwnProfile",
+        "description": "The ON CONFLICT branch assigned display_name = $3 (NULL) regardless of whether displayName was part of the request."
+      }
+    ],
+    "conditions": [
+      {
+        "kind": "user_interaction",
+        "description": "The customer submits a profile form that omits the display-name field after having set one."
+      }
+    ],
+    "execution": {
+      "attacker_perspective": "Not attacker-facing; a data-integrity defect that a normal user triggers by using the form.",
+      "payloads": [
+        "POST /api/me {\"action\":\"update_profile\",\"fullName\":\"Fatima Al Zayani\"}"
+      ],
+      "instructions": [
+        "As a signed-in customer, set a display name once (it is stored).",
+        "Later submit the profile form containing only the full name.",
+        "Observe that the display name in the database is now NULL."
+      ],
+      "expected_result": "Silent loss of a stored preference."
+    },
+    "remediation": {
+      "strategy": "Write each field only when it was present in the request, using explicit presence flags passed to SQL so the database itself decides between 'set' and 'keep'.",
+      "code_changes": [
+        {
+          "file_name": "src/lib/account/service.ts",
+          "fixed_code": "set full_name = case when $5::boolean then $2 else user_profiles.full_name end,\n    display_name = case when $6::boolean then $3 else user_profiles.display_name end,\n    preferred_locale = case when $7::boolean then coalesce($4, user_profiles.preferred_locale) else user_profiles.preferred_locale end"
+        }
+      ]
+    },
+    "severity": {
+      "likelihood": {
+        "score": "medium",
+        "reason": "A normal use of the product, not an edge case."
+      },
+      "impact": {
+        "score": "low",
+        "reason": "Loss of a single non-critical display preference; no PII exposure and no access consequence."
+      },
+      "overall_severity": "low"
+    },
+    "confidence": {
+      "score": "high",
+      "reason": "The unconditional assignment is plain in the SQL and the form sends only edited fields."
+    }
+  },
+  {
+    "verdict": "rejected",
+    "reason": "The claim was that the admin catalogue editor interpolates a request-supplied table name into SQL, enabling SQL injection when an operator edits subjects/stages/areas. In src/lib/admin/content.ts the identifier is not taken from the request: CATALOG_TABLES maps the zod-validated enum value (subjects | stages | areas | lessonTypes) to a fixed table name, and the interpolated fragment is always one of those literals. Every value in the same statement is a bound parameter ($2..$10). Verified by reading the whole call path from POST /api/admin/catalog through upsertCatalogItem."
+  },
+  {
+    "verdict": "rejected",
+    "reason": "The claim was that JSON-LD emitted with dangerouslySetInnerHTML can break out of the script tag on the tutor profile and homepage (titles derive from tutor-supplied text). Both call sites use serializeJsonLd() from src/lib/security/jsonld.ts, which escapes <, >, &, U+2028 and U+2029 before insertion, so a title containing </script><script> is serialised inertly. Verified against the module's escaping table and the two call sites."
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "wordmark": {
+    "font": "Poppins",
+    "weight": "600",
+    "text": "EDURA",
+    "capHeightUnits": 357.6416,
+    "advance": 1784.126,
+    "trackingEm": 0.0485
+  },
+  "mark": {
+    "viewBox": "0 0 1679 1531",
+    "width": 1679.0,
+    "height": 1531.0,
+    "aspect": 1.0967
+  },
+  "lockups": {
+    "stacked": {
+      "width": 1784.126,
+      "height": 2632.708,
+      "aspect": 0.6777
+    },
+    "horizontal": {
+      "width": 3966.826,
+      "height": 1531.0,
+      "aspect": 2.591
+    },
+    "wordmark": {
+      "width": 1784.126,
+      "height": 357.642,
+      "aspect": 4.9886
+    }
+  },
+  "geometry": {
+    "stackGapInCapHeights": 0.486,
+    "sideGapInMarkWidths": 0.3
+  }
+}

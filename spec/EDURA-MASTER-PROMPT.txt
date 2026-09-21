@@ -1,0 +1,199 @@
+MASTER PROMPT — BUILD "EDURA" — A PRODUCTION-READY PRIVATE TUTORING PLATFORM (BAHRAIN)
+0. NON-NEGOTIABLE EXECUTION RULES
+	•	This is a production build, not a prototype, mockup, or landing page.
+	•	Do not explain what should be built — build it, end to end: requirements → architecture → database → auth → core features → dashboards → booking → WhatsApp → payment workflow → security → testing → production build → final audit.
+	•	If you hit an error: identify root cause → fix → re-test → continue. Never stop at "here's the error."
+	•	Never ship a button, page, or flow that looks functional but isn't. Everything is either real or explicitly labeled "coming soon."
+	•	Never claim something works, passed, or was tested unless it actually was, in this environment, verifiably.
+	•	If something cannot be executed because the environment lacks a required service, say so explicitly instead of pretending it passed.
+1. ROLE
+Act as an integrated team in one: Product Architect, UX/UI Designer, Full-Stack Engineer, Database Architect, Security Engineer, QA Engineer, DevOps Engineer. You own the full lifecycle of this build.
+2. PROJECT CONCEPT
+Edura connects students/parents in Bahrain with qualified private tutors — with special focus on graduates of teacher-training/education colleges and other qualified individuals seeking teaching opportunities. Covers Primary, Intermediate/Preparatory, and Secondary/High school.
+Core discovery-to-booking flow: browse/search tutors → review qualifications and profile → select subject, lesson type, teaching method, date/time → submit booking request.
+Payment workflow (v1, manual):
+booking created → customer handed off to WhatsApp with a dynamically generated message → instructed to pay via BenefitPay → customer sends payment proof via WhatsApp → admin manually verifies → admin confirms booking → tutor and customer notified.
+Do NOT implement an online payment gateway in v1. The architecture MUST allow one to be added later without rebuilding the booking system (see §14).
+3. CORE BUSINESS MODEL
+	•	Tutors may pay a subscription fee (monthly/annual) to stay active. Support: subscription status, active/inactive, expiry, grace period, admin-controlled pricing (never hard-coded).
+	•	Architecture must also support a future per-booking platform commission, without a rebuild.
+4. BRAND IDENTITY — EDURA (use the attached brand kit as ground truth)
+A full brand system already exists and MUST be treated as the single source of truth for all visual decisions — do not invent a new brand.
+	•	Logo system: primary logo, symbol-only, horizontal, compact, monochrome, reverse, app icon, favicon — reuse as provided, do not redraw the mark.
+	•	Color palette: Academic Navy #102A56, Primary Blue #2563EB, Light Blue #60A5FA, Very Light Blue #EFF6FF, Warm White #FAFBFC, Graphite #172033.
+	•	Typography: Manrope for English/Latin text, Cairo for Arabic — both must be loaded properly with correct font-weights; never substitute with system fonts as a fallback for production.
+	•	Tagline (bilingual): "The right tutor. A brighter future." / "المعلم المناسب... مستقبل أفضل."
+	•	Brand icons: search, location, online, home, subjects, profile, calendar, messages — use the provided icon language consistently across web and admin.
+	•	Brand voice/pattern: the geometric mark represents Connection → Learning → Progress. Reflect this progression subtly in onboarding/empty-state illustrations if used.
+4.1 Hero section — mandatory line
+The homepage hero MUST explicitly and prominently state that the platform is Bahraini, with pride — this is a trust signal for parents and tutors alike. Include it as a visible line near the headline/tagline (not buried in the footer), in both languages, e.g.:
+	•	Arabic: "منصة بحرينية بفخر" (or an equivalent natural phrasing — do not literally translate word-for-word if it reads awkwardly; it must read as native, confident Arabic copy).
+	•	English: "Proudly Bahraini."
+This line sits alongside the existing hero headline ("مدرسك المناسب… في الوقت والمكان المناسب") and CTAs — it must not replace them, and must not look like a generic disclaimer. Treat it as a badge/kicker style element consistent with the "Local Bahraini identity" brand pillar already defined in §brand direction below.
+5. BRAND / DESIGN DIRECTION
+Premium, modern, trustworthy Bahraini education platform. Communicate: trust, education, professionalism, safety, human connection, modern technology, local Bahraini identity, premium quality without feeling corporate or cold. Avoid generic "school website" design — this should feel like a modern tech marketplace fused with a premium education brand.
+Use excellent typography, strong hierarchy, elegant cards, professional tutor profile cards, subtle purposeful animation, generous whitespace, high-quality icons, responsive layouts, accessible contrast, mobile-first design. Motion improves UX — it never distracts.
+6. LANGUAGES
+Arabic (primary, RTL) and English (LTR), fully implemented from the start — not a handful of translated labels. Every buttons, form, validation message, nav item, dashboard, email, notification, booking detail, admin screen, empty state, and error state must exist in both languages, switchable throughout the entire app. Use professional Arabic typography (Cairo, per §4) — never a low-quality Arabic font fallback.
+7. ROLES
+7.1 Student / Parent
+Create account, login, browse/search/filter tutors, view tutor profile, select subject/stage/lesson type/method/date-time, submit booking, view booking history/status, receive notifications, contact platform via WhatsApp, rate tutor after a completed lesson, manage profile. Support parent-books-for-child: parent name, student name, student grade/stage, student age (optional), student gender (where operationally relevant), subject, notes.
+Minor-data rule: student records tied to a minor are a distinct sensitive data category — access-controlled separately from the parent account's own PII, never exposed on public tutor-facing views, and covered explicitly in the privacy policy (§44).
+7.2 Tutor
+Dedicated dashboard. Registration collects: full name, profile photo, phone, email, city/area, nationality (if required), qualification, university/college, major, graduation year, subjects taught, stages, years of experience, short bio, teaching method, home/online availability, preferred areas, price per lesson/hour, available days/times, supporting documents.
+Profile is never publicly visible by default. Initial status: PENDING VERIFICATION. Statuses: Pending, Under Review, Approved, Rejected, Suspended, Expired Subscription. Only APPROVED + ACTIVE tutors appear publicly.
+8. TUTOR PROFILE PAGE
+Display: photo, name, verification badge, qualification, specialization, subjects, stages, areas served, teaching methods, experience, rating, completed-lessons count, bio, availability, price, home/online flags, languages spoken, reviews.
+Primary CTA: "احجز حصة". Secondary CTA: "تواصل معنا".
+Never publicly expose: private email, private address, internal documents, identity documents, payment information.
+9. TUTOR SEARCH
+Filter by subject, stage, city/area, lesson type, home/online, price range, gender (if the business enables it), rating, availability, experience, qualification. Tutor cards show: name, qualification, subject, area, rating, price, teaching options, verification status, book button.
+10. LESSON TYPES (admin-configurable, not hard-coded)
+Private Lesson, Intensive Course, Exam Preparation, Subject Revision, Small Group (architecture-ready for multiple students later).
+11. TEACHING METHODS
+Home (tutor visits student) and Online (Zoom). Store Zoom links manually per booking for now — no fake video system. Architecture must allow a future meeting-provider integration (see §14).
+12. BOOKING FLOW
+	1.	Select tutor.
+	2.	Select student, subject, stage, lesson type, method, date, time, duration, location (if home), notes.
+	3.	System calculates/displays price.
+	4.	Customer confirms request.
+	5.	System creates a unique booking ID, format EDU-DDMMYYYY-XXXX (e.g. EDU-26092026-0001).
+	6.	Status → PENDING_PAYMENT.
+	7.	Show a professional confirmation page.
+	8.	Generate a dynamic WhatsApp message (never static/generic) containing: booking ID, customer name, student name, tutor, subject, stage, lesson type, method, date, time, duration, price, area (if applicable), notes.
+	9.	Open WhatsApp to the official number: +973 6666 1238.
+Concurrency requirement: booking creation must be transaction-safe at the database level (not just validated in application code) so two simultaneous requests for the same tutor/date/time cannot both succeed. Use a DB-level unique constraint or row-level locking on the (tutor, date, time-range) tuple — state explicitly which mechanism you used and why.
+13. WHATSAPP + BENEFITPAY MANUAL PAYMENT WORKFLOW
+Payment method shown to customer: BenefitPay, with instruction copy: "Please complete the payment through BenefitPay and send the payment confirmation/proof through WhatsApp." Admin verifies manually.
+Booking status state machine (enforce transitions server-side, no arbitrary status jumps): Pending Payment → Payment Verification → Paid → Confirmed → Tutor Accepted → Scheduled → In Progress → Completed | Cancelled | Rejected | Refund Requested → Refunded.
+14. FUTURE-READY PROVIDER ABSTRACTIONS
+Design these as swappable interfaces so v1's manual implementation never blocks a future integration without rewriting core business logic:
+	•	PaymentProvider → v1: ManualBenefitPayProvider. Future: online gateway.
+	•	NotificationProvider, EmailProvider, WhatsAppProvider, VideoMeetingProvider, StorageProvider — same pattern: simple v1 implementation behind an interface the booking/subscription logic depends on, not the concrete provider.
+15. ADMIN DASHBOARD
+Manage: tutors (view/approve/reject/suspend/reactivate/edit/verify/view documents/view subscription), students-parents (view/edit/suspend/reactivate/view bookings), bookings (view/filter/search/detail/status change/payment verification/confirm/cancel/reassign), payments (records/status/mark-verified/reference/verification date/verifier/manual refunds), subjects/stages/areas/lesson-types (full CRUD), pricing (tutor subscription, lesson fees if platform-priced, future commission, optional service fees — never hard-coded), reviews (moderate/hide/restore/report), notifications (announcements, booking/tutor/student notifications), CMS (homepage sections, FAQ, About, contact info, Terms, Privacy, hero text, promo banners).
+Admin account hardening (mandatory, not optional): strong password policy enforced server-side, and either MFA or an equivalent step-up verification for admin login — the admin account is the highest-value target in this system given tutor documents and payment records.
+16. ADMIN ANALYTICS
+Total/active/pending/suspended tutors, total/active students, total/pending/confirmed/completed/cancelled bookings, pending/verified payments, subscription revenue, booking revenue, monthly revenue, recent bookings. Charts only where they genuinely aid understanding. Never fabricate analytics data — if there's no data yet, show a real empty state.
+17. NOTIFICATIONS
+New booking, payment pending/verified, booking confirmed/cancelled, tutor approval/rejection, subscription expiring, lesson reminder, review request. Architecture ready for future Email/WhatsApp-API/SMS/Push — never claim one of these channels is live unless it's actually wired up.
+18. BOOKING REMINDERS
+Scheduled-job-ready: 24h-before and 2h-before lesson reminders, post-lesson review request.
+19. REVIEWS
+Only after a completed booking. Fields: rating (1–5), written review, optional categories. Block: duplicate reviews per booking, reviews on cancelled bookings, reviews before completion. Admin moderation required.
+20. SECURITY (first-class requirement, not a checklist to skim)
+Secure auth, password hashing, RBAC, server-side authorization on every sensitive action (never trust frontend permission checks), input validation, output sanitization, rate limiting — explicitly and non-optionally on login and booking-creation endpoints, CSRF protection where applicable, secure session handling, secure DB rules, file upload restrictions (type + size + storage location), no sensitive data in client-side code, no exposed API secrets, environment variables for all secrets, protected admin routes, audit logging.
+21. DOCUMENT VERIFICATION (tutor documents)
+Never expose public URLs to tutor documents. Store behind access control; only authorized admins can retrieve them, via time-limited signed URLs, not permanent public links. Log every access (who, when, which document) in the audit log.
+22. DATABASE
+Normalized schema, minimum entities: users, profiles, tutors, students, subjects, educational_stages, areas, lesson_types, tutor_subjects, tutor_stages, tutor_availability, tutor_documents, subscriptions, subscription_plans, bookings, booking_items, payments, payment_proofs, reviews, notifications, messages, settings, audit_logs. Foreign keys, indexes, timestamps, soft deletion where appropriate — no god-tables.
+23. DATABASE DESIGN PRINCIPLES
+UUIDs where appropriate, created_at/updated_at, status fields, FKs, unique constraints, indexes, transaction-safe booking creation (per §12). Tutor availability checked server-side — never trust the frontend calendar alone.
+24. BOOKING CONFLICT PREVENTION
+A tutor cannot receive two confirmed bookings for overlapping date/time. Only statuses representing an active reservation block a slot; cancelled/rejected bookings never block availability. Enforce server-side per §12.
+25. DATA RETENTION & ACCOUNT DELETION
+Define and implement a data retention policy: how long booking/payment/document records are kept, and a working "delete my account" path for students/parents that removes or anonymizes personal data while preserving what's legally/financially required to keep (e.g. payment audit trail) — flagged clearly which is which.
+26. USER EXPERIENCE
+Minimal friction from homepage to booking request. Homepage CTA: "ابحث عن مدرس" / secondary: "انضم كمدرس". Clear multi-step booking UI with visible progress: المدرس → المادة → الحصة → الموعد → التأكيد.
+27. HOMEPAGE
+Hero (headline "مدرسك المناسب… في الوقت والمكان المناسب" + the Bahraini-pride line from §4.1 + supporting text + primary/secondary CTA), How it works, Browse subjects, Browse stages, Featured tutors, Home/Online/Exam-prep/Intensive highlights, Why choose Edura, Safety/trust section, FAQ, Become a tutor, final CTA, footer. No fake statistics — use meaningful feature statements if no real numbers exist yet.
+28. SUBJECT CATALOG (admin-configurable, not hard-coded)
+Mathematics, Arabic, English, Science, Physics, Chemistry, Biology, Social Studies, Computer Science, Islamic Studies, and an "Other" mechanism.
+29. RESPONSIVE DESIGN
+Perfect on iPhone, Android, tablet, laptop, desktop. Real mobile UX, not a shrunk desktop layout. Admin dashboard may use a distinct responsive layout suited to data-heavy screens.
+30. ACCESSIBILITY
+Contrast, keyboard navigation, labels, accessible forms, visible focus states, semantic HTML, screen-reader-friendly controls, accessible error messages and dialogs.
+31. SEO
+Metadata, Open Graph, Twitter/X cards where relevant, semantic HTML, sitemap, robots.txt, structured data where appropriate, clean URLs, Arabic + English metadata, SEO-friendly tutor profile URLs.
+32. PERFORMANCE
+Optimize images, fonts, JS, DB queries, API calls; server rendering where appropriate; lazy loading; caching where appropriate. No unnecessary dependencies. Must load fast on mobile connections.
+33. TECHNOLOGY STACK
+	•	Frontend: Next.js, TypeScript, Tailwind CSS.
+	•	Backend: Next.js API routes or an equivalent properly structured backend.
+	•	Database: PostgreSQL / Supabase.
+	•	Auth: secure, compatible with the chosen backend, with admin MFA per §15.
+	•	Storage: secure object storage for tutor documents and profile images, with signed-URL access per §21.
+34. MANDATORY SKILL UTILIZATION
+The executing AI tool has a library of installed skills. This is not optional guidance — actually invoke these skills at the corresponding phase of the build, don't just mention them. If a skill exists for the task at hand, using it is required; skipping it and free-handing the equivalent work is treated as a failure to follow this prompt.
+Phase 0 — Methodology & planning
+	•	superpowers — run the overall software-development methodology (brainstorm → plan → implement) for this build.
+	•	prompt-engineering — for any sub-prompts you generate for yourself or other tools during the build.
+	•	task-observer — keep monitoring the build for skill-worthy opportunities as it progresses.
+Phase 1 — UX/UI & design system (before writing implementation code, per §33's own "design before code" principle)
+	•	ui-ux-pro-max and high-end-visual-design — define information architecture, user journeys, and the visual design system (typography, spacing, components).
+	•	stitch-design-taste, design-taste-frontend, gpt-taste, apple-design — apply as cross-checks against generic/templated output; the platform must not look like a default template.
+	•	21st-dev — pull production-quality shadcn/ui-ecosystem components where they fit, instead of hand-rolling basic UI primitives.
+	•	bilingual-quote-generator — directly relevant to the Arabic RTL + English bilingual requirement in §6; use its bilingual-content patterns for any generated copy/quotes.
+Phase 2 — Brand asset production
+	•	brandkit — treat the attached Edura brand kit as the canonical input and extend it (any missing brand asset) consistently.
+	•	imagegen-frontend-web and imagegen-frontend-mobile — generate any additional premium imagery needed for web and the mobile-responsive views.
+	•	nano-banana / codex-image — generate or edit specific image assets (icons, illustrations, photography-direction pieces) as needed.
+	•	image-to-code — when translating any of the attached brand-kit mockup screens directly into implemented UI.
+Phase 3 — Implementation
+	•	supabase-cli — create and manage the actual PostgreSQL/Supabase database (schema, migrations) directly, matching §22–24.
+	•	full-output-enforcement — do not truncate generated code; this is a large multi-module build and incomplete files are not acceptable.
+	•	ponytail / ponytail-review — keep the implementation to the simplest solution that actually works; use ponytail-review to catch over-engineering before final delivery.
+	•	web-interface-guidelines — apply to every interactive web surface (forms, dashboards, booking stepper).
+	•	github-sync-helper — manage version control/repo operations for the project.
+	•	cloudflare-dns — if/when domain and deployment DNS configuration is needed.
+Phase 4 — QA, security, and delivery
+	•	security-audit — run this as the actual mechanism for the full security audit required in §47, not a manual self-check only.
+	•	browser-automation — drive real end-to-end tests of the booking flow, auth, and admin actions described in §46, rather than describing tests that weren't run.
+	•	self-improving-agent — log what was learned/fixed during the build for future iterations.
+	•	redesign-existing-projects — use this if any later iteration revisits and upgrades an already-built part of Edura.
+If any listed skill is unavailable in the executing environment at build time, state that explicitly rather than silently skipping it, and note what was done instead.
+35. WHATSAPP INTEGRATION
+Number: +973 6666 1238. Message must be dynamically generated from the actual booking record (never hard-coded customer info), safely URL-encoded. Structure (bilingual-ready):
+السلام عليكم،
+أرغب في حجز حصة تعليمية.
+
+رقم الطلب: EDU-XXXXXXXX
+الطالب: …
+المدرس: …
+المادة: …
+المرحلة: …
+نوع الدرس: …
+طريقة التدريس: …
+التاريخ: …
+الوقت: …
+المدة: …
+المبلغ: …
+
+ملاحظات:
+…
+
+36. PAYMENT PROOF
+Record: payment status, amount, booking ID, method (BenefitPay), reference (optional), verification status, verified-by, verified-at, admin notes. If proof is uploaded in-platform, store it securely (per §21's access rules). If proof arrives only via WhatsApp, record that it was received externally — never claim WhatsApp messages are auto-imported unless a real WhatsApp API integration exists.
+37. TUTOR SUBSCRIPTION
+Tutor sees: plan, status, start date, expiry date, days remaining. Expired subscription blocks new bookings; admin configures whether existing confirmed bookings remain accessible after expiry. First subscription payment method is also manual BenefitPay — no fake automated billing.
+38. ADMIN AUDIT LOG
+Record: tutor approved/rejected/suspended, booking status changes, payment verified/rejected, subscription changes, user suspended, settings changed, and document access events (§21). Each entry: actor, action, entity, entity ID, timestamp, relevant metadata.
+39. ERROR HANDLING
+Every important operation: loading, success, error, empty states. User-friendly errors — never expose stack traces, DB errors, secrets, or internal implementation details.
+40. VALIDATION
+Both frontend AND backend, always: phone, email, required fields, date, time, price, duration, file type/size, booking availability, user permissions. Never rely on client-side validation alone.
+41. ADMIN SETTINGS
+Central, admin-editable: platform name, logo, WhatsApp number, support email, BenefitPay instructions, tutor subscription prices, currency, booking rules, cancellation rules, review rules, notification settings, subjects, stages, areas, lesson types. Don't hard-code business settings unnecessarily.
+42. CURRENCY
+Bahraini Dinar. Display: د.ب / BHD. Store monetary values with proper numeric/decimal DB types — never floating point for financial calculations.
+43. LOCALIZATION
+Bahrain-focused: Arabic-first, BHD currency, Bahrain phone format, Bahrain-oriented areas (database-driven and admin-editable, never a hard-coded fixed list), RTL support throughout.
+44. LEGAL / TRUST PAGES
+Terms & Conditions, Privacy Policy (explicitly covering minor/student data per §25), Tutor Terms, Cancellation Policy, Refund Policy, Child/student safety policy, Contact Us. Use placeholders where legal review is genuinely required — never invent legal claims.
+45. NO FAKE FUNCTIONALITY
+Every implemented control either performs a real action, navigates to a real page, opens a real modal, submits real data, or is clearly marked unavailable/coming soon. No fake login, booking, payment, admin stats, or API integrations.
+46. TESTING (actually run these, per §34 Phase 4)
+Auth (register/login/logout/reset/role permissions), Tutor (registration/verification/profile/availability/subscription), Student (registration/search/filter/booking), Booking (create/validate/prevent-conflict/cancel/confirm/complete), Payment (pending/verification/paid/rejected), WhatsApp (correct number/dynamic message/correct encoding), Admin (permissions/tutor mgmt/booking mgmt/payment verification/settings), Mobile (all key workflows on mobile layouts).
+47. SECURITY AUDIT BEFORE DELIVERY
+Use security-audit (§34) to check specifically for: broken access control, IDOR, auth vulnerabilities, authorization bypass, SQL injection, XSS, CSRF, unsafe file upload, exposed secrets, insecure storage, sensitive data exposure, rate-limit gaps, privilege escalation, exposed admin routes, client-side-only authorization. Fix everything found before delivery.
+48. CODE QUALITY AUDIT
+Before delivery: remove unused imports/dead code/unused deps, fix TypeScript/ESLint/build errors, fix broken routes/links, fix console errors, check migrations, env vars, API endpoints, auth/authz, responsive layouts.
+49. PRODUCTION BUILD
+Must pass: TypeScript check, lint, build, DB validation, tests, security checks. Do not declare the project ready if the production build fails. If something can't run because the environment lacks a required service, say so plainly instead of pretending it passed.
+50. FINAL DELIVERABLE
+Complete source code, DB schema/migrations, seed data (clearly labeled as demo data), auth, admin/tutor/student dashboards, booking system, WhatsApp integration, manual BenefitPay workflow, notifications, reviews, settings, security implementation, SEO, responsive UI, documentation, .env.example, deployment instructions — ready for Vercel or the appropriate production environment.
+51. PRODUCT EXPERIENCE
+Must feel like a real, launchable Bahraini commercial platform — not a student project. No excessive gradients, no unadapted generic template sections, no lorem ipsum. Realistic Arabic/English UI copy. No fabricated tutor reviews or business statistics; demo/seed data is clearly labeled as such.
+52. FINAL RESPONSE FORMAT
+On completion, provide a concise final report: (1) what was built, (2) tech stack, (3) DB structure, (4) auth, (5) booking workflow, (6) WhatsApp workflow, (7) BenefitPay manual payment workflow, (8) admin capabilities, (9) security measures — including which skills were actually invoked per §34, (10) tests performed and their results, (11) build status, (12) any remaining configuration required from the user. Never claim something works unless it was actually tested.
+START NOW. Analyze the complete requirements and architecture first, then build the actual platform. No tutorials — build it.
