@@ -1017,27 +1017,20 @@ html[lang|="ar"] .step__n {
 
 /* --------------------------------------------------------------------------
    Motion
-   The hidden state is only applied when the browser can animate and the visitor
-   has not asked for reduced motion: `html.has-motion` is set by a tiny inline
-   script before first paint (see app/layout.tsx). Without JS - or with reduced
-   motion - every element is simply visible.
+   --------------------------------------------------------------------------
+   2026-09-22: the scroll-reveal system is GONE. It hid every `[data-reveal]`
+   element (opacity 0) and relied on a CSS transition to bring it back — and on
+   the live site the transition stuck at its start value, so the entire page
+   rendered blank behind the header. Forcing `transition: none` on a stuck
+   element made it appear instantly, which is what identified the cause.
+
+   Removing it is also the right call on its own terms: a staggered fade-up on
+   scroll is one of the patterns the operator's brief calls out, and content
+   that is visible without JavaScript is strictly more robust. The
+   `data-reveal` attributes are left in place (inert) so the markup does not
+   need a second sweep; `[data-parallax]` is kept below, where a transform is
+   set from a CSS variable rather than animated by a transition.
    -------------------------------------------------------------------------- */
-.has-motion [data-reveal] {
-  opacity: 0;
-  transform: translate3d(0, 18px, 0);
-  will-change: opacity, transform;
-}
-
-.has-motion [data-reveal].is-revealed {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-  transition:
-    opacity var(--dur-reveal) var(--ease-soft),
-    transform var(--dur-reveal) var(--ease-soft);
-  transition-delay: calc(var(--reveal-i, 0) * 90ms);
-  will-change: auto;
-}
-
 [data-parallax] {
   transform: translate3d(0, var(--parallax-y, 0px), 0);
   will-change: transform;
@@ -1054,12 +1047,6 @@ html[lang|="ar"] .step__n {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-  }
-
-  .has-motion [data-reveal],
-  .has-motion [data-reveal].is-revealed {
-    opacity: 1;
-    transform: none;
   }
 
   [data-parallax] {

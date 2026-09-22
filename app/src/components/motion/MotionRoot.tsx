@@ -1,56 +1,35 @@
 "use client";
 
 /**
- * One small client component owns every motion behaviour on marketing pages:
+ * One small client component owns the motion behaviours that are left:
  *
- *  - scroll reveal   `[data-reveal]` fades/translates in once, staggered by the
- *                    `--reveal-i` custom property (line-by-line cadence)
  *  - parallax        `[data-parallax]` translates by a few percent of its own
  *                    height, driven by rAF on scroll (never on every event)
  *  - header state    `.site-header[data-scrolled]` for the hairline border
  *
- * Deliberately not a wrapper component: pages stay server-rendered, and all of
- * this degrades to plain visible content when JS is off or the visitor prefers
- * reduced motion (the hidden state only exists under `html.has-motion`).
+ * The scroll-reveal was removed on 2026-09-22 — see the note in globals.css. It
+ * hid every `[data-reveal]` element and leaned on a CSS transition to show it
+ * again, and on the live site that transition stuck at its start value, so the
+ * whole page rendered blank behind the header. Content that is visible without
+ * JavaScript is also simply more robust.
+ *
+ * Deliberately not a wrapper component: pages stay server-rendered.
  */
 import { useEffect } from "react";
 
-const REVEAL_MARGIN = "0px 0px -12% 0px";
 const PARALLAX_MAX = 0.04; // never more than 4% of the element's height
 
 export function MotionRoot() {
   useEffect(() => {
+    // `no-js` is set on <html> by the layout so a JS-less visitor is never
+    // served the hidden state. Nothing removed it once the app hydrated.
+    document.documentElement.classList.remove("no-js");
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reduce.matches) {
       document.documentElement.classList.remove("has-motion");
       return;
     }
-
-    const revealed = new WeakSet<Element>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          entry.target.classList.add("is-revealed");
-          revealed.add(entry.target);
-          observer.unobserve(entry.target);
-        }
-      },
-      { rootMargin: REVEAL_MARGIN, threshold: 0.12 },
-    );
-
-    const observeReveals = () => {
-      document.querySelectorAll("[data-reveal]:not(.is-revealed)").forEach((el) => {
-        if (revealed.has(el)) return;
-        observer.observe(el);
-      });
-    };
-    observeReveals();
-
-    // Any element that scrolls into view after a client-side navigation or a
-    // late data render is picked up by a MutationObserver-free re-scan.
-    const rescan = window.setInterval(observeReveals, 1200);
-    const stopRescan = window.setTimeout(() => window.clearInterval(rescan), 12_000);
 
     // --- parallax -----------------------------------------------------------
     const layers = Array.from(document.querySelectorAll<HTMLElement>("[data-parallax]"));
@@ -87,9 +66,6 @@ export function MotionRoot() {
     onHeaderScroll();
 
     return () => {
-      observer.disconnect();
-      window.clearInterval(rescan);
-      window.clearTimeout(stopRescan);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       window.removeEventListener("scroll", onHeaderScroll);
