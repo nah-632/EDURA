@@ -8,7 +8,7 @@
  * than showing a message frozen in the language it was created in.
  */
 import { useState } from "react";
-import { Link } from "next/link";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { createTranslator, formatDateTime, type Locale } from "@/lib/i18n";

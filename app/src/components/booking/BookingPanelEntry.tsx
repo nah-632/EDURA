@@ -33,6 +33,8 @@ export interface BookingPanelEntryProps {
     book: string;
     note: string;
     duration: string;
+    /** Shown under the duration field; passed by the tutor profile page. */
+    durationNote: string;
     subject: string;
     methodLabel: string;
     total: string;

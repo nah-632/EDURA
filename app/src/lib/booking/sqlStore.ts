@@ -105,7 +105,10 @@ export class SqlBookingStore implements BookingStore {
           and starts_at <= ($3::date + interval '2 days')`,
       [tutorId, fromDate, toDate],
     );
-    return rows;
+    // Every other method here maps columns to the interface's camelCase shape;
+    // this one returned the raw rows, so SqlBookingStore was not assignable to
+    // BookingStore and nothing that took a BookingStore would accept it.
+    return rows.map((r) => ({ startsAt: r.starts_at, endsAt: r.ends_at }));
   }
 
   async getBusy(tutorId: string, fromDate: string, toDate: string) {

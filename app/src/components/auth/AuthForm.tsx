@@ -12,10 +12,24 @@ import { useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { loginSchema, registerSchema } from "@/lib/validation/schemas";
 
+/**
+ * The label KEYS this form assigns to `string` state or to a
+ * `Record<string, string>` (as opposed to rendering them, where `undefined` is
+ * a valid React node). Under `noUncheckedIndexedAccess` every index access is
+ * `string | undefined`, so the ones that must be real strings are declared here
+ * — that is the contract the callers already satisfy.
+ */
+export type AuthFormLabels = Record<string, string> & {
+  v_required: string;
+  v_passwordMismatch: string;
+  e_unexpected: string;
+  e_network: string;
+};
+
 export interface AuthFormProps {
   mode: "login" | "register";
   locale: Locale;
-  labels: Record<string, string>;
+  labels: AuthFormLabels;
 }
 
 export function AuthForm({ mode, locale, labels }: AuthFormProps) {

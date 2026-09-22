@@ -747,7 +747,7 @@ export function getBookingAdmin(id: string): Promise<AdminData<BookingAdminDetai
           limit 40`,
         [id],
       ),
-      queryOne<{ id: string; rating: number; status: string; comment: string | null }>(
+      queryOne<{ id: string; rating: number; status: ReviewStatus; comment: string | null }>( // reviews.status is the review_status enum cast to text, so ReviewStatus is exact
         `select id, rating, status::text as status, comment from reviews where booking_id = $1`,
         [id],
       ),

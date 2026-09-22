@@ -29,7 +29,13 @@ export interface BookingStepperProps {
   windows: AvailabilityWindow[];
   signedIn: boolean;
   initial: { subject: string; duration: number; method: "home" | "online" };
-  labels: Record<string, string>;
+  /**
+   * Label keys read as VALUES (`.split("|")`) and not merely rendered. Under
+   * `noUncheckedIndexedAccess` an index access is `string | undefined`, so the
+   * keys that must be real strings are declared required here — which is what
+   * the callers already provide.
+   */
+  labels: Record<string, string> & { stages: string; subjects: string };
 }
 
 interface Student {

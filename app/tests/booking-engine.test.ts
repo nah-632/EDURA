@@ -156,7 +156,14 @@ test("a valid request creates a pending_payment booking with the right price", a
 });
 
 test("a tutor who is not approved, or has no active subscription, cannot be booked", async () => {
-  for (const patch of [{ status: "pending" }, { status: "suspended" }, { subscriptionActive: false }]) {
+  // Typed, not inferred: as a bare array literal `status` widens to `string`
+  // and the patch stops being assignable to a tutor row.
+  const patches: Partial<TutorForBooking>[] = [
+    { status: "pending" },
+    { status: "suspended" },
+    { subscriptionActive: false },
+  ];
+  for (const patch of patches) {
     const s = new MemStore({ "t-1": { ...tutor, ...patch } }, { "st-1": student });
     await assert.rejects(() => createBookingRequest(s, deps, request), (err: unknown) => {
       assert.ok(err instanceof BookingError);

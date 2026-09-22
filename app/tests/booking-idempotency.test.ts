@@ -1,7 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { createBookingRequest, type BookingStore, type BookingRow, type CreateBookingRequest } from "@/lib/booking/engine";
+import {
+  createBookingRequest,
+  type BookingStore,
+  type BookingRow,
+  type CreateBookingRequest,
+  type TutorForBooking,
+} from "@/lib/booking/engine";
 import type { AvailabilityWindow } from "@/lib/booking/availability";
 
 /**
@@ -17,7 +23,10 @@ class Store implements BookingStore {
   readonly byKey = new Map<string, BookingRow & { customerUserId: string }>();
   inserted = 0;
 
-  async getTutor() {
+  // The return type is annotated so the literal is checked against
+  // TutorForBooking instead of being widened - `status` inferred as `string` is
+  // what made this class fail to implement BookingStore.
+  async getTutor(): Promise<TutorForBooking | null> {
     return {
       id: "t1",
       userId: "u-tutor",

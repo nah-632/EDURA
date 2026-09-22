@@ -24,6 +24,9 @@ export interface BookingListItem {
   stageName: string | null;
   tutorName: string | null;
   tutorSlug: string | null;
+  /** Selected by LIST_COLUMNS but missing from this interface, so the tutor
+   *  screens could not read it. */
+  customerName: string | null;
   studentName: string | null;
   areaName: string | null;
   paymentStatus: PaymentStatus | null;

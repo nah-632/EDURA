@@ -129,7 +129,14 @@ export function UploadForm({
         return (
           <label className="field" key={field.name}>
             <span className="label">{field.label}</span>
-            <input className="input" type="text" name={field.name} defaultValue={field.value ?? ""} />
+            <input
+              className="input"
+              type="text"
+              name={field.name}
+              /* The fallback branch also covers boolean fields, and
+                 `defaultValue` takes no boolean - String() keeps it honest. */
+              defaultValue={String(field.value ?? "")}
+            />
           </label>
         );
       })}

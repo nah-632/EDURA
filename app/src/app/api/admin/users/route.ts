@@ -44,18 +44,27 @@ export async function POST(request: Request): Promise<Response> {
   if (!gate.ok) return gate.response;
 
   try {
-    if (input.action === "grant_role" || input.action === "revoke_role") {
-      const result = await assignUserRole(gate.ctx, {
+    // Narrow on the ACCOUNT actions rather than the role ones. Written the other
+    // way round, `input.reason` below did not narrow and the build failed with
+    // "Property 'reason' does not exist"; checking the variant that needs the
+    // property is both clearer and what the checker actually follows.
+    if (
+      input.action === "restrict" ||
+      input.action === "suspend" ||
+      input.action === "reactivate"
+    ) {
+      const result = await applyUserAction(gate.ctx, {
         userId: input.userId,
-        roleCode: input.roleCode,
-        grant: input.action === "grant_role",
+        action: input.action,
+        reason: input.reason ?? null,
       });
       return jsonResponse({ ok: true, ...result });
     }
-    const result = await applyUserAction(gate.ctx, {
+
+    const result = await assignUserRole(gate.ctx, {
       userId: input.userId,
-      action: input.action,
-      reason: input.reason ?? null,
+      roleCode: input.roleCode,
+      grant: input.action === "grant_role",
     });
     return jsonResponse({ ok: true, ...result });
   } catch (err) {

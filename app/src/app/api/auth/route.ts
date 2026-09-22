@@ -121,9 +121,13 @@ export async function POST(request: Request): Promise<Response> {
           actorLabel: parsed.data.payload.email,
           action: "auth.login_failed",
           entity: "users",
+          // AuditEntry requires entityId; a failed sign-in has no entity. The
+          // reason belongs in `reason`, which the type provides, not nested in
+          // `after`.
+          entityId: null,
+          reason: result.failure ?? "unknown",
           ip,
           userAgent,
-          after: { reason: result.failure ?? "unknown" },
         });
         const status = result.failure === "mfa_required" || result.failure === "mfa_invalid" ? 401 : 401;
         return apiError(result.failure ?? "invalid_credentials", status);

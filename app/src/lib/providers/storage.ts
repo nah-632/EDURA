@@ -68,7 +68,10 @@ export class SupabaseStorage implements StorageProvider {
     const res = await fetch(this.objectUrl(bucket, path), {
       method: "POST",
       headers: { ...this.headers(contentType), "x-upsert": "true" },
-      body: bytes,
+      // lib.dom's BodyInit no longer accepts `Uint8Array<ArrayBufferLike>`.
+      // slice() returns a view over its own ArrayBuffer, which is a BodyInit —
+      // no cast, and the bytes are identical.
+      body: bytes.slice().buffer,
     });
     if (!res.ok) {
       const text = await res.text().catch(() => "");
