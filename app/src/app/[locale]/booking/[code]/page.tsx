@@ -79,7 +79,6 @@ export default async function BookingConfirmationPage({
     <section className="section">
       <div className="shell legal-layout">
         <header className="stack-sm">
-          <span className="kicker tracked">{t("booking.created.title")}</span>
           <h1 className="display display--section">{booking.code}</h1>
           <div className="row" style={{ gap: "0.5rem", flexWrap: "wrap" }}>
             <BookingStatus locale={locale} status={booking.status} />

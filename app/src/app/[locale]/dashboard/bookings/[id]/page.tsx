@@ -78,7 +78,6 @@ export default async function CustomerBookingDetailPage({
     <div className="admin-section">
       <div className="row--between" style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
         <div className="stack-xs">
-          <span className="kicker tracked">{t("booking.detail.title")}</span>
           <h1 className="display display--section" style={{ fontSize: "var(--text-h3)" }}>
             <span translate="no">{booking.code}</span>
           </h1>

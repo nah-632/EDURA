@@ -169,7 +169,6 @@ export default async function LegalPage({
     <section className="section">
       <div className="shell legal-layout">
         <header className="stack-xs">
-          <span className="kicker tracked">{t("footer.legal")}</span>
           <h1 className="display display--section">{t(entry.titleKey as never)}</h1>
           <p className="field__hint">{t("legal.lastUpdated", { date: updated })}</p>
           {entry.introKey ? <p className="lead">{t(entry.introKey as never)}</p> : null}

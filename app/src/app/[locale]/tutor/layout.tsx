@@ -31,7 +31,6 @@ export default async function TutorLayout({
       <section className="section">
         <div className="shell legal-layout">
           <div className="card stack-sm">
-            <span className="kicker tracked">{t("tutor.dashboard.title")}</span>
             <h1 className="display display--section" style={{ fontSize: "var(--text-h3)" }}>
               {gate.reason === "unauthenticated" ? t("auth.signInToContinue") : t("tutor.join.title")}
             </h1>
@@ -67,7 +66,6 @@ export default async function TutorLayout({
       <header className="admin-shell__header">
         <div className="shell admin-shell__inner">
           <div className="stack-xs">
-            <span className="kicker tracked">{t("tutor.dashboard.title")}</span>
             <strong>{gate.session.user.fullName}</strong>
           </div>
           <div className="row" style={{ gap: "0.5rem" }}>

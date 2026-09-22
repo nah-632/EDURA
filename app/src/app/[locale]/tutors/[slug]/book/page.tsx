@@ -49,7 +49,6 @@ export default async function BookPage({
     <section className="section">
       <div className="shell stack">
         <div className="stack-xs">
-          <span className="kicker tracked">{t("booking.title")}</span>
           <h1 className="display display--section" style={{ fontSize: "var(--text-h3)" }}>
             {t("booking.subtitle")}
           </h1>

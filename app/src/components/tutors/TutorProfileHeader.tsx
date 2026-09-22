@@ -27,17 +27,14 @@ export function TutorProfileHeader({ locale, tutor, subjects, photoUrl = null }:
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={photoUrl} alt="" width={2000} height={900} decoding="async" />
         </div>
-      ) : (
-        <div className="band__media band__media--designed" data-parallax aria-hidden="true">
-          <span className="band__glow" />
-        </div>
-      )}
+      ) : null}
+      {/* No decorative fallback: a soft gradient bloom behind the name is the
+          same generated-site pattern as the hero gradient, and a tutor's own
+          photograph is the only thing worth putting here. A solid navy band
+          with the name on it is the honest default. */}
       <div className="band__scrim" aria-hidden="true" />
 
       <div className="shell band__inner">
-        <span className="kicker kicker--onDark tracked" data-reveal style={{ "--reveal-i": 0 } as React.CSSProperties}>
-          {tutor.verified ? t("profile.verifiedBadge") : t("label.unavailable")}
-        </span>
 
         <h1 className="display display--section display--onDark">
           <span data-reveal style={{ "--reveal-i": 1 } as React.CSSProperties}>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { createTranslator, type Locale } from "@/lib/i18n";
+import { bandPhotoUrl, familyPhotoUrl } from "@/lib/brand/hero-photo";
 import type { Option } from "@/lib/data/catalog";
 
 /**
@@ -36,22 +37,39 @@ export function HowItWorks({ locale }: { locale: Locale }) {
 
   return (
     <section className="section" id="how">
-      <div className="shell">
-        <div className="section__head">
-          <span className="kicker tracked">{t("home.how.title")}</span>
-          <h2 className="display display--section">{t("home.how.subtitle")}</h2>
+      <div className="shell how__grid">
+        <div className="how__copy">
+          <div className="section__head">
+            <h2 className="display display--section">{t("home.how.subtitle")}</h2>
+          </div>
+          <ol className="how__steps">
+            {steps.map((step, i) => (
+              <Reveal key={step} index={i} as="li" className="step">
+                <span className="step__n" aria-hidden="true">
+                  {String(step).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="step__title">{t(`home.how.step${step}.title` as never)}</h3>
+                  <p className="step__body">{t(`home.how.step${step}.body` as never)}</p>
+                </div>
+              </Reveal>
+            ))}
+          </ol>
         </div>
-        <div className="grid grid--4">
-          {steps.map((step, i) => (
-            <Reveal key={step} index={i} className="step">
-              <span className="step__n" aria-hidden="true">
-                {String(step).padStart(2, "0")}
-              </span>
-              <h3 className="step__title">{t(`home.how.step${step}.title` as never)}</h3>
-              <p className="step__body">{t(`home.how.step${step}.body` as never)}</p>
-            </Reveal>
-          ))}
-        </div>
+
+        {/* Booking a tutor happens at home, with a parent in the room. The
+            photograph says that faster than another paragraph would. */}
+        <figure className="how__figure" data-reveal>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={familyPhotoUrl()}
+            alt=""
+            width={1100}
+            height={614}
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
       </div>
     </section>
   );
@@ -60,6 +78,30 @@ export function HowItWorks({ locale }: { locale: Locale }) {
 // ---------------------------------------------------------------------------
 export function SubjectGrid({ locale, subjects }: { locale: Locale; subjects: Option[] }) {
   const t = createTranslator(locale);
+  // A tile per subject inside identical white cards, so the differentiation the
+  // brief asks for has to come from the tile: a distinct glyph (below) and a
+  // tint drawn from the brand palette. Five tints, not ten — a rainbow would
+  // read as decoration.
+  const TINTS: Record<string, "terracotta" | "sand" | "navy" | "teal" | "gold"> = {
+    math: "navy",
+    arabic: "terracotta",
+    english: "teal",
+    science: "sand",
+    physics: "navy",
+    chemistry: "terracotta",
+    biology: "teal",
+    social: "gold",
+    cs: "navy",
+    islamic: "sand",
+  };
+  const subjectTint = (code: string): React.CSSProperties => {
+    const tint = TINTS[code] ?? "sand";
+    return {
+      "--subject-tint": `var(--tint-${tint})`,
+      "--subject-ink": `var(--tint-${tint}-ink)`,
+    } as React.CSSProperties;
+  };
+
   // One glyph per subject code in the reference data (drizzle/0001). Every
   // subject a visitor can click has to say what it is at a glance; falling
   // back to a notebook for eight of ten tiles made the grid read as broken.
@@ -135,14 +177,17 @@ export function SubjectGrid({ locale, subjects }: { locale: Locale; subjects: Op
     <section className="section section--tight" id="subjects">
       <div className="shell">
         <div className="section__head">
-          <span className="kicker tracked">{t("home.subjects.title")}</span>
           <h2 className="display display--section">{t("home.subjects.subtitle")}</h2>
         </div>
         <ul className="subject-grid">
           {subjects.slice(0, 10).map((subject, i) => (
             <Reveal as="li" key={subject.id} index={i % 5}>
               <Link className="subject" href={`/${locale}/tutors?subject=${subject.code}`}>
-                <span className="subject__icon" aria-hidden="true">
+                <span
+                  className="subject__icon"
+                  aria-hidden="true"
+                  style={subjectTint(subject.code)}
+                >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
                     {icons[subject.code] ?? icons.default}
                   </svg>
@@ -164,7 +209,6 @@ export function StageStrip({ locale, stages }: { locale: Locale; stages: Option[
     <section className="section section--tight">
       <div className="shell">
         <div className="section__head">
-          <span className="kicker tracked">{t("home.stages.title")}</span>
           <h2 className="display display--section">{t("home.stages.subtitle")}</h2>
         </div>
         <div className="stage-strip">
@@ -172,9 +216,6 @@ export function StageStrip({ locale, stages }: { locale: Locale; stages: Option[
             <Reveal key={stage.id} index={i} className="stage">
               <Link href={`/${locale}/tutors?stage=${stage.code}`}>
                 <strong>{stage.name}</strong>
-                <span className="stage__more" aria-hidden="true">
-                  →
-                </span>
               </Link>
             </Reveal>
           ))}
@@ -199,7 +240,6 @@ export function Highlights({ locale }: { locale: Locale }) {
     <section className="section">
       <div className="shell">
         <div className="section__head">
-          <span className="kicker tracked">{t("home.highlights.title")}</span>
         </div>
         <div className="grid grid--4">
           {items.map((item, i) => (
@@ -228,7 +268,6 @@ export function WhyEdura({ locale }: { locale: Locale }) {
     <section className="section section--pale">
       <div className="shell">
         <div className="section__head">
-          <span className="kicker tracked">{t("home.why.title")}</span>
           <h2 className="display display--section">{t("brand.tagline")}</h2>
         </div>
         <div className="grid grid--2">
@@ -253,7 +292,6 @@ export function SafetySection({ locale }: { locale: Locale }) {
     <section className="section">
       <div className="shell">
         <div className="card" style={{ display: "grid", gap: "1rem" }}>
-          <span className="kicker tracked">{t("home.safety.title")}</span>
           <h2 className="display display--section" style={{ fontSize: "var(--text-h3)" }}>
             {t("legal.safety.s1")}
           </h2>
@@ -298,7 +336,6 @@ export function AboutTeaser({
     <section className="section" id="about">
       <div className="shell">
         <div className="section__head">
-          <span className="kicker tracked">{t("home.about.kicker")}</span>
           <h2 className="display display--section">{t("home.about.title")}</h2>
         </div>
         <div className="grid grid--2">
@@ -315,9 +352,6 @@ export function AboutTeaser({
             <div className="row">
               <Link className="btn btn--outline btn--sm" href={`/${locale}/about`}>
                 {t("home.about.link")}
-                <span className="btn__arrow" aria-hidden="true">
-                  →
-                </span>
               </Link>
             </div>
           </div>
@@ -348,7 +382,6 @@ export function GuaranteeBadges({ locale, hours }: { locale: Locale; hours: numb
     <section className="section section--tight">
       <div className="shell">
         <div className="section__head">
-          <span className="kicker tracked">{t("home.guarantee.kicker")}</span>
           <h2 className="display display--section">{t("home.guarantee.title")}</h2>
           <p className="lead" style={{ maxWidth: "62ch" }}>
             {t("home.guarantee.body")}
@@ -385,7 +418,6 @@ export function FaqSection({ locale }: { locale: Locale }) {
     <section className="section" id="faq">
       <div className="shell">
         <div className="section__head">
-          <span className="kicker tracked">{t("home.faq.title")}</span>
         </div>
         <div className="faq">
           {items.map((item, i) => (
@@ -403,7 +435,13 @@ export function FaqSection({ locale }: { locale: Locale }) {
 }
 
 // ---------------------------------------------------------------------------
-export function BecomeTutorBand({ locale, photoUrl = null }: { locale: Locale; photoUrl?: string | null }) {
+export function BecomeTutorBand({
+  locale,
+  photoUrl = bandPhotoUrl(),
+}: {
+  locale: Locale;
+  photoUrl?: string | null;
+}) {
   const t = createTranslator(locale);
   return (
     <section className="band">
@@ -415,7 +453,6 @@ export function BecomeTutorBand({ locale, photoUrl = null }: { locale: Locale; p
       ) : null}
       <div className="band__scrim" aria-hidden="true" />
       <div className="shell band__inner">
-        <span className="kicker kicker--onDark tracked">{t("home.becomeTutor.title")}</span>
         <h2 className="display display--section display--onDark">
           <span data-reveal style={{ "--reveal-i": 0 } as React.CSSProperties}>
             {t("home.becomeTutor.point1")}
@@ -441,9 +478,6 @@ export function BecomeTutorBand({ locale, photoUrl = null }: { locale: Locale; p
           </Link>
           <Link className="btn btn--lg btn--ghostOnPhoto" href={`/${locale}/how`}>
             {t("nav.how")}
-            <span className="btn__arrow" aria-hidden="true">
-              →
-            </span>
           </Link>
         </div>
       </div>
@@ -458,15 +492,15 @@ export function FinalCta({ locale }: { locale: Locale }) {
     <section className="section">
       <div className="shell">
         <div className="cta-band">
-          <h2 className="display display--section display--onDark" style={{ fontSize: "var(--text-h3)" }}>
+          <h2 className="display display--section" style={{ fontSize: "var(--text-h3)" }}>
             {t("home.cta.title")}
           </h2>
-          <p style={{ color: "rgba(226,236,255,.88)", maxWidth: "56ch" }}>{t("home.cta.body")}</p>
+          <p style={{ color: "var(--ink-soft)", maxWidth: "56ch" }}>{t("home.cta.body")}</p>
           <div className="row">
-            <Link className="btn btn--lg btn--onPhoto" href={`/${locale}/tutors`}>
+            <Link className="btn btn--lg btn--primary" href={`/${locale}/tutors`}>
               {t("cta.searchTutor")}
             </Link>
-            <Link className="btn btn--lg btn--ghostOnPhoto" href={`/${locale}/contact`}>
+            <Link className="btn btn--lg btn--outline" href={`/${locale}/contact`}>
               {t("cta.contactUs")}
             </Link>
           </div>

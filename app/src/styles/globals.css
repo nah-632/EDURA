@@ -22,34 +22,47 @@
    ========================================================================== */
 
 :root {
-  /* ---- Brand palette, v2 (measured from the client brand kit board) ---- */
-  --deep: #17434a;          /* deep teal: headings, dark brand surfaces   */
-  --deep-700: #1f545c;
-  --deep-900: #0e2e33;
-  --brand: #3f9da5;         /* Bahraini turquoise - identity + graphics   */
-  --brand-strong: #2a6e75;  /* turquoise that can carry text (AA)         */
-  --brand-light: #7fc4ca;
-  --brand-tint: #dfeeef;    /* turquoise wash surfaces                    */
-  --brand-tint-soft: #f0f7f7;
-  --accent: #bf6743;        /* terracotta - the action colour             */
-  --accent-strong: #9e5231; /* terracotta that carries white text (AA)    */
+  /* ---- Palette, revision 2 (2026-09-22) -------------------------------
+     Derived from the logo: the terracotta sail is the accent, the paper is
+     warm neutral, the text is navy. Verified by scripts/check-contrast.mjs.
+     ---------------------------------------------------------------------- */
+  --navy: #16305a;          /* headings and the few dark surfaces         */
+  --navy-700: #1e3e6e;
+  --navy-900: #0f2244;
+  --brand: #3f9da5;         /* logo turquoise - graphics only, never text */
+  --accent: #bf6743;        /* terracotta: THE accent                     */
+  --accent-strong: #9e5231; /* terracotta that carries white text, and links */
   --accent-hover: #8a4629;
-  --accent-tint: #f8e9e1;
+  --accent-tint: #f7e9e1;
   --sand: #d7c097;          /* sandy beige - warm secondary surface       */
   --sand-tint: #f3eada;
-  --warm: #fbf8f2;          /* Pearl White - the page                      */
-  --graphite: #33383a;      /* kit graphite                               */
+  --warm: #faf7f1;          /* the page                                   */
+  --cream: #f4efe4;         /* the warm band                              */
 
   /* Support (ratio-verified by scripts/check-contrast.mjs) */
-  --ink: #33383a;
-  --ink-soft: #4a5254;
-  --ink-mute: #666e70;
-  --line: #e7dfd2;
-  --line-strong: #8b8375;   /* >=3:1 on the page: form/control borders    */
+  --ink: #2c3956;
+  --ink-soft: #4a5570;
+  --ink-mute: #657087;
+  --line: #e8e0d2;
+  --line-strong: #8b8375;
   --ok: #2e7d5b;
   --warn: #8a5410;
   --danger: #b4392c;
   --gold: #a8813c;
+
+  /* Subject tints. One tile per subject in the same white card, so the
+     difference has to come from the tile's own colour; the palette is small
+     and drawn from the brand, never a rainbow. */
+  --tint-terracotta: #f7e9e1;
+  --tint-terracotta-ink: #9e5231;
+  --tint-sand: #f3eada;
+  --tint-sand-ink: #7a5410;
+  --tint-navy: #e7ecf5;
+  --tint-navy-ink: #16305a;
+  --tint-teal: #e2f0f1;
+  --tint-teal-ink: #1f6e76;
+  --tint-gold: #f6eedc;
+  --tint-gold-ink: #8a5a12;
 
   --shell: 1180px;
   --gutter: clamp(1rem, 4vw, 2.5rem);
@@ -60,16 +73,16 @@
   --radius-lg: 18px;
   --radius-pill: 999px;
 
-  --shadow-xs: 0 1px 2px rgba(23, 67, 74, 0.05);
-  --shadow-sm: 0 1px 2px rgba(23, 67, 74, 0.05), 0 8px 20px -14px rgba(23, 67, 74, 0.18);
-  --shadow-md: 0 2px 4px rgba(23, 67, 74, 0.06), 0 18px 40px -20px rgba(23, 67, 74, 0.28);
-  --shadow-lg: 0 4px 8px rgba(23, 67, 74, 0.07), 0 32px 64px -28px rgba(23, 67, 74, 0.34);
+  --shadow-xs: 0 1px 2px rgba(22, 48, 90, 0.05);
+  --shadow-sm: 0 1px 2px rgba(22, 48, 90, 0.05), 0 8px 20px -14px rgba(22, 48, 90, 0.18);
+  --shadow-md: 0 2px 4px rgba(22, 48, 90, 0.06), 0 18px 40px -20px rgba(22, 48, 90, 0.28);
+  --shadow-lg: 0 4px 8px rgba(22, 48, 90, 0.07), 0 32px 64px -28px rgba(22, 48, 90, 0.34);
 
   /* Type */
-  --font-body-latin: "Open Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-body-arabic: "Noto Kufi Arabic", system-ui, -apple-system, sans-serif;
-  --font-display-latin: "Poppins", "Open Sans", system-ui, sans-serif;
-  --font-display-arabic: "Reem Kufi", "Noto Kufi Arabic", system-ui, sans-serif;
+  --font-body-latin: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body-arabic: "IBM Plex Sans Arabic", system-ui, -apple-system, sans-serif;
+  --font-display-latin: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-display-arabic: "El Messiri", "IBM Plex Sans Arabic", system-ui, sans-serif;
 
   --text-hero: clamp(2.35rem, 1.35rem + 4.4vw, 4.6rem);
   --text-display: clamp(1.85rem, 1.2rem + 2.6vw, 3.1rem);
@@ -133,7 +146,7 @@ h2,
 h3,
 h4 {
   margin: 0;
-  color: var(--deep);
+  color: var(--navy);
   font-weight: 700;
   line-height: 1.25;
   text-wrap: balance;
@@ -171,13 +184,13 @@ html[lang|="ar"] .tracked {
 }
 
 :focus-visible {
-  outline: 2px solid var(--brand-strong);
+  outline: 2px solid var(--accent-strong);
   outline-offset: 3px;
   border-radius: 3px;
 }
 
 ::selection {
-  background: var(--brand-strong);
+  background: var(--accent-strong);
   color: #fff;
 }
 
@@ -187,7 +200,7 @@ html[lang|="ar"] .tracked {
   inset-block-start: -4rem;
   transform: translateX(-50%);
   z-index: 100;
-  background: var(--deep);
+  background: var(--navy);
   color: #fff;
   padding: 0.7rem 1.2rem;
   border-radius: 0 0 var(--radius-sm) var(--radius-sm);
@@ -225,7 +238,7 @@ html[lang|="ar"] .tracked {
   font-weight: 500;
   line-height: var(--display-leading);
   letter-spacing: var(--display-tracking);
-  color: var(--deep);
+  color: var(--navy);
   text-wrap: balance;
 }
 
@@ -237,41 +250,9 @@ html[lang|="ar"] .tracked {
   font-size: var(--text-display);
 }
 
-/* Italic emphasis: real italic in Latin (Open Sans has a drawn italic), and in
-   Arabic an accent-coloured phrase with a hand-drawn underline rule - faux
-   obliquing Arabic is never acceptable. */
-.display__em {
-  font-style: italic;
-  font-weight: 500;
-}
-
-html[lang|="ar"] .display__em {
-  font-style: normal;
-  font-weight: 700;
-  color: var(--brand-strong);
-  padding-inline: 0.06em;
-  /* a thin rule under the phrase instead of a faux italic: Arabic has no
-     oblique form, and faking one is the fastest way to look cheap in RTL. */
-  background-image: linear-gradient(to top, rgba(158, 82, 49, 0.3), rgba(158, 82, 49, 0.3));
-  background-repeat: no-repeat;
-  background-size: 100% 2px;
-  background-position: 0 96%;
-}
-
-/* On the deep surface the emphasis must be the light turquoise: terracotta
-   has no contrast against deep teal. */
-.display--onDark .display__em,
-html[lang|="ar"] .display--onDark .display__em {
-  color: var(--brand-light);
-  /* repeat + position MUST be repeated here: background shorthand state does
-     not cascade per-property, and without them a 2px gradient tiles itself
-     into a solid block behind the phrase. */
-  background-image: linear-gradient(to top, rgba(127, 196, 202, 0.45), rgba(127, 196, 202, 0.45));
-  background-repeat: no-repeat;
-  background-size: 100% 2px;
-  background-position: 0 96%;
-}
-
+/* Light text on the dark surfaces that remain (the tutor profile band and the
+   footer). The per-phrase emphasis that used to live here is gone: display
+   headings are one weight and one colour now. */
 .display--onDark {
   color: #fff;
 }
@@ -283,36 +264,8 @@ html[lang|="ar"] .display--onDark .display__em {
   max-width: 48ch;
 }
 
-.kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--brand-strong);
-}
-
-.kicker::before {
-  content: "";
-  inline-size: 1.75rem;
-  block-size: 1px;
-  background: currentColor;
-  opacity: 0.6;
-}
-
-html[lang|="ar"] .kicker {
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.kicker--onDark {
-  color: #bfe3e6;
-}
-
-.rule-top {
-  border-top: 2px solid var(--deep);
+html[lang|="ar"] .rule-top {
+  border-top: 2px solid var(--navy);
   padding-top: 0.9rem;
 }
 
@@ -369,27 +322,27 @@ html[lang|="ar"] .kicker {
 
 .btn--outline {
   --btn-bg: transparent;
-  --btn-fg: var(--deep);
+  --btn-fg: var(--navy);
   --btn-border: var(--line-strong);
   box-shadow: none;
 }
 
 .btn--outline:hover {
-  --btn-bg: var(--brand-tint);
+  --btn-bg: var(--sand-tint);
   --btn-border: var(--accent-strong);
-  --btn-fg: var(--deep);
+  --btn-fg: var(--navy);
 }
 
 /* On the photographic hero: a solid white CTA + a ghost CTA, which is the
    reference pairing expressed in Edura's palette. */
 .btn--onPhoto {
   --btn-bg: #fff;
-  --btn-fg: var(--deep);
+  --btn-fg: var(--navy);
   box-shadow: 0 12px 30px -14px rgba(11, 40, 44, 0.7);
 }
 
 .btn--onPhoto:hover {
-  --btn-bg: var(--brand-tint);
+  --btn-bg: var(--sand-tint);
 }
 
 .btn--ghostOnPhoto {
@@ -423,136 +376,263 @@ html[lang|="ar"] .kicker {
 
 .btn--quiet {
   --btn-bg: transparent;
-  --btn-fg: var(--deep);
+  --btn-fg: var(--navy);
   --btn-border: transparent;
   box-shadow: none;
   padding-inline: 0.6rem;
 }
 
 .btn--quiet:hover {
-  --btn-bg: var(--brand-tint);
+  --btn-bg: var(--sand-tint);
 }
 
 /* Arrow glyph: mirrors automatically in RTL because it is a logical icon. */
-.btn__arrow {
-  transition: transform var(--dur) var(--ease-out);
+html[dir="rtl"] .btn:hover html[dir="rtl"] .btn:hover /* --------------------------------------------------------------------------
+   Hero
+   -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   Empty state
+   -------------------------------------------------------------------------- */
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  text-align: center;
+  padding: clamp(2rem, 5vw, 3rem) 1.5rem;
+  border-radius: var(--radius-lg);
 }
 
-html[dir="rtl"] .btn__arrow {
-  transform: scaleX(-1);
+.empty-state--paper {
+  background: var(--sand-tint);
+  border: 1px solid var(--line);
 }
 
-.btn:hover .btn__arrow {
-  transform: translateX(3px);
+.empty-state--plain {
+  background: transparent;
+  border: 1px dashed var(--line-strong);
 }
 
-html[dir="rtl"] .btn:hover .btn__arrow {
-  transform: scaleX(-1) translateX(3px);
+.empty-state__mark {
+  display: grid;
+  place-items: center;
+  inline-size: 68px;
+  block-size: 68px;
+  border-radius: var(--radius-pill);
+  background: var(--warm);
+  box-shadow: var(--shadow-xs);
+  margin-block-end: 0.35rem;
+}
+
+.empty-state__title {
+  color: var(--navy);
+  font-size: 1.06rem;
+}
+
+.empty-state__body {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--ink-soft);
+}
+
+.empty-state .btn {
+  margin-block-start: 0.5rem;
 }
 
 /* --------------------------------------------------------------------------
-   Hero
+   How it works — steps beside a photograph
+   -------------------------------------------------------------------------- */
+.how__grid {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 3rem);
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .how__grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  }
+}
+
+.how__copy {
+  min-inline-size: 0;
+}
+
+.how__steps {
+  display: grid;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.how__steps .step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+}
+
+/* The numerals are figures, not an eyebrow: same treatment as the headings. */
+.how__steps .step__n {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.how__figure {
+  margin: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 16 / 11;
+  background: var(--cream);
+  box-shadow: var(--shadow-md);
+}
+
+.how__figure img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* A band on paper rather than a dark slab: three dark sections in a row was
+   the repetition the brief calls out. */
+.band--light {
+  background: var(--cream);
+  color: var(--ink);
+  border-block-end: 1px solid var(--line);
+}
+
+.band--light .band__scrim,
+.band--light .band__media {
+  display: none;
+}
+
+.band--light .display {
+  color: var(--navy);
+}
+
+/* --------------------------------------------------------------------------
+   Hero — warm, light, photographic.
+   --------------------------------------------------------------------------
+   Revision 2026-09-22: this replaced a dark teal gradient with a wavy line
+   pattern behind it. That treatment is the single most common hero in
+   generated sites, and it fought the photograph. Here the photograph is a
+   first-class element beside the copy, the page stays warm and light, and the
+   text is navy on paper at AA contrast rather than white over a scrim.
    -------------------------------------------------------------------------- */
 .hero {
   position: relative;
   isolation: isolate;
+  background: var(--warm);
+  border-block-end: 1px solid var(--line);
+  padding-block: clamp(2rem, 5vw, 3.75rem) 0;
+}
+
+.hero__grid {
   display: grid;
-  align-items: end;
-  min-height: clamp(520px, 72svh, 860px);
-  overflow: hidden;
-  background: var(--deep-900);
+  gap: clamp(1.75rem, 4vw, 3.25rem);
+  align-items: center;
+  grid-template-columns: 1fr;
+  padding-block-end: clamp(2rem, 5vw, 3rem);
 }
 
-.hero__media {
-  position: absolute;
-  inset: -6% 0 -12% 0; /* headroom for the parallax translation */
-  z-index: 0;
+@media (min-width: 900px) {
+  .hero__grid {
+    /* copy leads; the photograph supports it */
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  }
 }
 
-.hero__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 38%;
-}
-
-/* RTL parity: the photographic subject is framed differently so the tutor's
-   gaze is not lost behind the mirrored text column. */
-html[dir="rtl"] .hero__media img {
-  object-position: 58% 38%;
-}
-
-.hero__scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background:
-    linear-gradient(to top, rgba(14, 46, 51, 0.94) 0%, rgba(14, 46, 51, 0.72) 26%, rgba(14, 46, 51, 0.18) 55%, rgba(14, 46, 51, 0.34) 100%),
-    /* Physical direction + an explicit RTL override below: cssnano's gradient
-       minifier (used by `next build`) crashes on logical keywords inside
-       linear-gradient(), and this form is also unambiguous to read. */
-    linear-gradient(to right, rgba(14, 46, 51, 0.72) 0%, rgba(14, 46, 51, 0) 62%);
-}
-
-html[dir="rtl"] .hero__scrim {
-  background:
-    linear-gradient(to top, rgba(14, 46, 51, 0.94) 0%, rgba(14, 46, 51, 0.72) 26%, rgba(14, 46, 51, 0.18) 55%, rgba(14, 46, 51, 0.34) 100%),
-    linear-gradient(to left, rgba(14, 46, 51, 0.72) 0%, rgba(14, 46, 51, 0) 62%);
-}
-
-.hero__inner {
-  position: relative;
-  z-index: 2;
+.hero__copy {
   display: grid;
-  gap: 1.35rem;
-  /* the shell centres itself; the editorial hero column must sit on the
-     start edge (mirrored automatically by the logical property) */
-  margin-inline-start: 0;
-  padding-block: clamp(3rem, 9vh, 7rem) clamp(2.75rem, 7vh, 5.5rem);
-  text-align: start;
-  max-width: 44rem;
+  gap: 1.15rem;
+  align-content: center;
+}
+
+/* §5: the Bahraini identity belongs in the hero. It reads as ordinary text —
+   the previous tracked all-caps label with a rule in front of it was doing
+   decoration's job instead of the sentence's. */
+.hero__identity {
+  margin: 0;
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 0.98rem;
 }
 
 .hero__title {
-  color: #fff;
-  margin-block: 0.15rem 0;
-  text-shadow: 0 2px 24px rgba(11, 40, 44, 0.35);
+  margin: 0;
+  color: var(--navy);
 }
 
 .hero__lead {
-  color: rgba(223, 238, 239, 0.9);
-  max-width: 42ch;
+  margin: 0;
+  color: var(--ink-soft);
+  max-width: 46ch;
 }
 
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.85rem;
-  margin-block-start: 0.5rem;
+  gap: 0.75rem;
+  margin-block-start: 0.35rem;
 }
 
 .hero__trust {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  margin-block-start: 1.4rem;
-  padding-block-start: 1.1rem;
-  border-block-start: 1px solid rgba(255, 255, 255, 0.18);
-  color: rgba(223, 238, 239, 0.82);
+  gap: 0.5rem 1.4rem;
+  margin: 0.6rem 0 0;
+  padding: 0.9rem 0 0;
+  list-style: none;
+  border-block-start: 1px solid var(--line);
+  color: var(--ink-mute);
   font-size: 0.86rem;
 }
 
-.hero__trust span {
+.hero__trust li {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
 }
 
 .hero__trust svg {
   inline-size: 15px;
   block-size: 15px;
-  color: var(--brand-light);
+  color: var(--accent);
   flex: none;
+}
+
+.hero__figure {
+  margin: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--cream);
+  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 900px) {
+  .hero__figure {
+    aspect-ratio: 5 / 4;
+  }
+}
+
+.hero__figure img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: 62% 45%;
+  display: block;
+}
+
+/* RTL: mirror the framing so the subject is not hidden behind the copy column */
+html[dir="rtl"] .hero__figure img {
+  object-position: 38% 45%;
 }
 
 /* Search strip that overlaps the bottom of the hero */
@@ -573,18 +653,18 @@ html[dir="rtl"] .hero__scrim {
   padding-block: clamp(2.25rem, 5vw, 3.5rem);
 }
 
-.section--deep {
-  background: var(--deep);
+.section--navy {
+  background: var(--navy);
   color: #fff;
 }
 
-.section--deep h2,
-.section--deep h3 {
+.section--navy h2,
+.section--navy h3 {
   color: #fff;
 }
 
 .section--pale {
-  background: var(--brand-tint);
+  background: var(--sand-tint);
 }
 
 .section__head {
@@ -599,11 +679,7 @@ html[dir="rtl"] .hero__scrim {
   text-align: center;
 }
 
-.section__head--center .kicker {
-  justify-content: center;
-}
-
-.grid {
+.section__head--center .grid {
   display: grid;
   gap: clamp(1rem, 2.4vw, 1.6rem);
 }
@@ -639,8 +715,8 @@ html[dir="rtl"] .hero__scrim {
    thick border on one side: a one-sided bar reads as decoration, and the tint
    communicates the same "this one matters" without shouting. */
 .card--accent {
-  border: 1px solid #c6e2e4;
-  background: #f6fbfb;
+  border: 1px solid #e3d3b6;
+  background: #faf7f1;
 }
 
 .tcard {
@@ -680,8 +756,8 @@ html[dir="rtl"] .hero__scrim {
   inline-size: 52px;
   block-size: 52px;
   border-radius: var(--radius-pill);
-  background: var(--brand-tint);
-  color: var(--deep);
+  background: var(--sand-tint);
+  color: var(--navy);
   display: grid;
   place-items: center;
   font-weight: 800;
@@ -693,7 +769,7 @@ html[dir="rtl"] .hero__scrim {
 .tcard__name {
   font-size: 1.02rem;
   font-weight: 700;
-  color: var(--deep);
+  color: var(--navy);
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -718,7 +794,7 @@ html[dir="rtl"] .hero__scrim {
 .price {
   font-size: 0.98rem;
   font-weight: 800;
-  color: var(--deep);
+  color: var(--navy);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -744,9 +820,9 @@ html[dir="rtl"] .hero__scrim {
 }
 
 .chip--pale {
-  background: var(--brand-tint);
-  border-color: #c6e2e4;
-  color: var(--deep);
+  background: var(--sand-tint);
+  border-color: #e3d3b6;
+  color: var(--navy);
 }
 
 .chip--gold {
@@ -761,8 +837,8 @@ html[dir="rtl"] .hero__scrim {
   inline-size: 18px;
   block-size: 18px;
   border-radius: 50%;
-  background: var(--brand-tint);
-  color: var(--brand-strong);
+  background: var(--sand-tint);
+  color: var(--accent-strong);
   flex: none;
 }
 
@@ -782,20 +858,20 @@ html[dir="rtl"] .hero__scrim {
   font-family: var(--font-display);
   font-size: 2.6rem;
   line-height: 1;
-  color: var(--brand-strong);
+  color: var(--accent-strong);
 }
 
 html[lang|="ar"] .step__n {
   font-family: var(--font-body);
   font-weight: 800;
   font-size: 1.9rem;
-  color: var(--deep);
+  color: var(--navy);
 }
 
 .step__title {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--deep);
+  color: var(--navy);
 }
 
 .step__body {
@@ -813,8 +889,8 @@ html[lang|="ar"] .step__n {
   inline-size: 44px;
   block-size: 44px;
   border-radius: var(--radius);
-  background: var(--brand-tint);
-  color: var(--brand-strong);
+  background: var(--sand-tint);
+  color: var(--accent-strong);
   display: grid;
   place-items: center;
 }
@@ -841,7 +917,7 @@ html[lang|="ar"] .step__n {
   padding-block: 1.05rem;
   cursor: pointer;
   font-weight: 700;
-  color: var(--deep);
+  color: var(--navy);
   list-style: none;
 }
 
@@ -852,7 +928,7 @@ html[lang|="ar"] .step__n {
 .faq summary::after {
   content: "+";
   font-size: 1.35rem;
-  color: var(--brand-strong);
+  color: var(--accent-strong);
   transition: transform var(--dur) var(--ease-out);
 }
 
@@ -867,23 +943,25 @@ html[lang|="ar"] .step__n {
 }
 
 /* Call-to-action band */
+/* Revision 2026-09-22: this was a navy panel, which made four dark surfaces in
+   a row (band, CTA, footer, and the hero before it). It is now warm paper, so
+   the only dark surfaces left are the two that earn it: the tutor-photograph
+   band and the footer. */
 .cta-band {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, var(--deep) 0%, var(--deep-700) 62%, #1f6b73 100%);
-  color: #fff;
-  padding: clamp(1.75rem, 4vw, 3rem);
   display: grid;
-  gap: 1rem;
+  gap: 0.85rem;
   justify-items: start;
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  border-radius: var(--radius-lg);
+  background: var(--cream);
+  border: 1px solid var(--line);
 }
 
 /* Editorial band used by "become a tutor" and the tutor profile header */
 .band {
   position: relative;
   overflow: hidden;
-  background: var(--deep-900);
+  background: var(--navy-900);
   color: #fff;
   isolation: isolate;
 }
@@ -898,19 +976,34 @@ html[lang|="ar"] .step__n {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.55;
+  /* was 0.55, which muted the photograph into a texture */
+  opacity: 0.95;
 }
 
+/* Scrim: heavy where the text sits, light where the photograph should read.
+   The previous values darkened the far side to 0.3 and the near side to 0.94,
+   which left the classroom image almost invisible - the band read as one more
+   dark slab instead of a photograph.
+   On a phone the copy fills the full width, so a left/right scrim would never
+   let the image through: vertical there, directional from the wide layout up. */
 .band__scrim {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(to right, rgba(14, 46, 51, 0.94) 12%, rgba(14, 46, 51, 0.55) 58%, rgba(14, 46, 51, 0.3) 100%);
+  background: linear-gradient(to bottom, rgba(15, 34, 68, 0.5) 0%, rgba(15, 34, 68, 0.88) 62%, rgba(15, 34, 68, 0.96) 100%);
+}
+
+@media (min-width: 900px) {
+  .band__scrim {
+    background: linear-gradient(to right, rgba(15, 34, 68, 0.86) 6%, rgba(15, 34, 68, 0.6) 46%, rgba(15, 34, 68, 0.12) 82%, rgba(15, 34, 68, 0.04) 100%);
+  }
 }
 
 /* The scrim must darken the side the text sits on, so it flips with direction. */
-html[dir="rtl"] .band__scrim {
-  background: linear-gradient(to left, rgba(14, 46, 51, 0.94) 12%, rgba(14, 46, 51, 0.55) 58%, rgba(14, 46, 51, 0.3) 100%);
+@media (min-width: 900px) {
+  html[dir="rtl"] .band__scrim {
+    background: linear-gradient(to left, rgba(15, 34, 68, 0.86) 6%, rgba(15, 34, 68, 0.6) 46%, rgba(15, 34, 68, 0.12) 82%, rgba(15, 34, 68, 0.04) 100%);
+  }
 }
 
 .band__inner {
@@ -982,7 +1075,7 @@ html[dir="rtl"] .band__scrim {
    is reserved for actions.
    -------------------------------------------------------------------------- */
 .promo-banner {
-  background: var(--deep);
+  background: var(--navy);
   color: #fff;
   border-block-end: 1px solid rgba(255, 255, 255, 0.14);
 }
@@ -1000,9 +1093,9 @@ html[dir="rtl"] .band__scrim {
   inline-size: 7px;
   block-size: 7px;
   border-radius: var(--radius-pill);
-  background: var(--brand-light);
+  background: var(--sand);
   flex: none;
-  box-shadow: 0 0 0 4px rgba(127, 196, 202, 0.22);
+  box-shadow: 0 0 0 4px rgba(215, 192, 151, 0.22);
 }
 
 .promo-banner__text {
@@ -1061,7 +1154,7 @@ html[dir="rtl"] .band__scrim {
 
 .site-header__nav a:hover,
 .site-header__nav a[aria-current="page"] {
-  color: var(--deep);
+  color: var(--navy);
 }
 
 .site-header__nav a[aria-current="page"]::after {
@@ -1070,7 +1163,7 @@ html[dir="rtl"] .band__scrim {
   inset-inline: 0;
   inset-block-end: -2px;
   block-size: 2px;
-  background: var(--brand-strong);
+  background: var(--accent-strong);
   border-radius: 2px;
 }
 
@@ -1099,8 +1192,8 @@ html[dir="rtl"] .band__scrim {
 }
 
 .lang-switch:hover {
-  border-color: var(--brand-strong);
-  color: var(--deep);
+  border-color: var(--accent-strong);
+  color: var(--navy);
 }
 
 @media (min-width: 960px) {
@@ -1110,7 +1203,7 @@ html[dir="rtl"] .band__scrim {
 }
 
 .site-footer {
-  background: var(--deep-900);
+  background: var(--navy-900);
   color: rgba(231, 240, 240, 0.78);
   padding-block: clamp(2.5rem, 6vw, 4rem) 1.75rem;
   font-size: 0.92rem;
@@ -1125,12 +1218,15 @@ html[dir="rtl"] .band__scrim {
   color: #fff;
 }
 
+/* Column headings, not eyebrow labels: the tracked all-caps treatment is gone
+   along with the rest of them. */
 .site-footer h4 {
   color: #fff;
-  font-size: 0.82rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  margin-block-end: 0.85rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  margin-block-end: 0.7rem;
 }
 
 html[lang|="ar"] .site-footer h4 {
@@ -1142,6 +1238,21 @@ html[lang|="ar"] .site-footer h4 {
   display: grid;
   gap: clamp(1.5rem, 4vw, 3rem);
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.site-footer__sig {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.site-footer__mug {
+  inline-size: 40px;
+  block-size: 40px;
+  object-fit: cover;
+  border-radius: 9px;
+  flex: none;
+  opacity: 0.9;
 }
 
 .site-footer__bottom {
@@ -1168,7 +1279,7 @@ html[lang|="ar"] .site-footer h4 {
 .label {
   font-size: 0.86rem;
   font-weight: 700;
-  color: var(--deep);
+  color: var(--navy);
 }
 
 .input,
@@ -1195,7 +1306,7 @@ html[lang|="ar"] .site-footer h4 {
 .select:focus,
 .textarea:focus {
   outline: none;
-  border-color: var(--brand-strong);
+  border-color: var(--accent-strong);
   box-shadow: 0 0 0 3px rgba(158, 82, 49, 0.16);
 }
 
@@ -1291,8 +1402,8 @@ html[lang|="ar"] .table th {
 
 .status--info {
   color: #8a4629;
-  background: #dfeeef;
-  border-color: #c6e2e4;
+  background: #f3eada;
+  border-color: #e3d3b6;
 }
 
 .status--ok {
@@ -1353,55 +1464,15 @@ html[lang|="ar"] .table th {
 /* ==========================================================================
    Hero - designed fallback (no photograph supplied yet)
    ========================================================================== */
-.hero__media--designed {
-  background:
-    radial-gradient(120% 90% at 12% 108%, rgba(158, 82, 49, 0.5) 0%, rgba(158, 82, 49, 0) 58%),
-    linear-gradient(160deg, #0e2e33 0%, #17434a 52%, #1f6b73 100%);
-}
 
-.hero__glow {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(46% 40% at 78% 22%, rgba(215, 192, 151, 0.34) 0%, rgba(215, 192, 151, 0) 68%),
-    radial-gradient(38% 34% at 92% 62%, rgba(127, 196, 202, 0.28) 0%, rgba(127, 196, 202, 0) 70%);
-  mix-blend-mode: screen;
-}
 
-html[dir="rtl"] .hero__glow {
-  background:
-    radial-gradient(46% 40% at 22% 22%, rgba(215, 192, 151, 0.34) 0%, rgba(215, 192, 151, 0) 68%),
-    radial-gradient(38% 34% at 8% 62%, rgba(127, 196, 202, 0.28) 0%, rgba(127, 196, 202, 0) 70%);
-}
-
+html[dir="rtl"] 
 /* The hero texture echoes the mark's wave rather than laying a technical
    grid over the page: a grid reads as "engineering blueprint", which is the
    opposite of the warm, human, educational identity the brand kit defines. */
-.hero__waves {
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='46'%3E%3Cpath d='M0 23 Q27.5 4 55 23 T110 23 T165 23 T220 23' fill='none' stroke='%23ffffff' stroke-opacity='.085' stroke-width='1.4'/%3E%3C/svg%3E");
-  background-size: 220px 46px;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 34%, #000 72%, transparent 100%);
-  mask-image: linear-gradient(180deg, transparent 0%, #000 34%, #000 72%, transparent 100%);
-}
 
-.hero__mark {
-  position: absolute;
-  inset-block-end: -4%;
-  inset-inline-end: 3%;
-  color: #ffffff;
-  opacity: 0.14;
-}
 
-html[dir="rtl"] .hero__mark {
-  inset-inline-end: auto;
-  inset-inline-start: 4%;
-}
-
-.hero__kicker {
-  margin-block-end: 0.35rem;
-}
+html[dir="rtl"] 
 
 /* ==========================================================================
    Hero search strip
@@ -1429,7 +1500,7 @@ html[dir="rtl"] .hero__mark {
   padding: 0.15rem 0;
   min-height: 30px;
   font-weight: 700;
-  color: var(--deep);
+  color: var(--navy);
   background-color: transparent;
   background-image: linear-gradient(45deg, transparent 50%, var(--ink-mute) 50%),
     linear-gradient(135deg, var(--ink-mute) 50%, transparent 50%);
@@ -1448,7 +1519,7 @@ html[dir="rtl"] .search-strip__field .select {
 
 .search-strip__field .select:focus {
   box-shadow: none;
-  outline: 2px solid var(--brand-strong);
+  outline: 2px solid var(--accent-strong);
   outline-offset: 4px;
   border-radius: 4px;
 }
@@ -1467,7 +1538,7 @@ html[dir="rtl"] .search-strip__field .select {
 }
 
 .search-strip__link:hover {
-  color: var(--deep);
+  color: var(--navy);
 }
 
 @media (min-width: 900px) {
@@ -1512,7 +1583,7 @@ html[dir="rtl"] .search-strip__field .select {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   font-weight: 700;
-  color: var(--deep);
+  color: var(--navy);
   font-size: 0.94rem;
   transition:
     transform var(--dur) var(--ease-out),
@@ -1522,16 +1593,17 @@ html[dir="rtl"] .search-strip__field .select {
 
 .subject:hover {
   transform: translateY(-3px);
-  border-color: var(--brand-strong);
+  border-color: var(--accent-strong);
   box-shadow: var(--shadow-sm);
 }
 
 .subject__icon {
-  inline-size: 34px;
-  block-size: 34px;
-  border-radius: 9px;
-  background: var(--brand-tint);
-  color: var(--brand-strong);
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: 10px;
+  /* set per subject by the component; these are the neutral fallbacks */
+  background: var(--subject-tint, var(--sand-tint));
+  color: var(--subject-ink, var(--accent-strong));
   display: grid;
   place-items: center;
   flex: none;
@@ -1563,13 +1635,13 @@ html[dir="rtl"] .search-strip__field .select {
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   font-size: 1.05rem;
-  color: var(--deep);
+  color: var(--navy);
   transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out),
     border-color var(--dur) var(--ease-out);
 }
 
 .stage a:hover {
-  border-color: var(--brand-light);
+  border-color: var(--sand);
 }
 
 .stage a:hover {
@@ -1577,24 +1649,7 @@ html[dir="rtl"] .search-strip__field .select {
   box-shadow: var(--shadow-sm);
 }
 
-.stage__more {
-  color: var(--brand-strong);
-  transition: transform var(--dur) var(--ease-out);
-}
-
-html[dir="rtl"] .stage__more {
-  transform: scaleX(-1);
-}
-
-.stage a:hover .stage__more {
-  transform: translateX(3px);
-}
-
-html[dir="rtl"] .stage a:hover .stage__more {
-  transform: scaleX(-1) translateX(3px);
-}
-
-/* ==========================================================================
+html[dir="rtl"] .stage a:hover html[dir="rtl"] .stage a:hover /* ==========================================================================
    Editorial band lists
    ========================================================================== */
 .band__list {
@@ -1620,7 +1675,7 @@ html[dir="rtl"] .stage a:hover .stage__more {
   inline-size: 0.55rem;
   block-size: 0.55rem;
   border-radius: 2px;
-  background: var(--brand-light);
+  background: var(--sand);
   transform: rotate(45deg);
 }
 
@@ -1651,7 +1706,7 @@ html[dir="rtl"] .stage a:hover .stage__more {
   display: block;
   inline-size: 18px;
   block-size: 2px;
-  background: var(--deep);
+  background: var(--navy);
   border-radius: 2px;
   transition: transform var(--dur) var(--ease-out), opacity var(--dur) var(--ease-out);
 }
@@ -1686,7 +1741,7 @@ html[dir="rtl"] .stage a:hover .stage__more {
 .mobile-nav__panel a {
   padding: 0.45rem 0.2rem;
   font-weight: 600;
-  color: var(--deep);
+  color: var(--navy);
 }
 
 @media (min-width: 960px) {
@@ -1699,17 +1754,11 @@ html[dir="rtl"] .stage a:hover .stage__more {
    Tutor profile band
    ========================================================================== */
 .band--profile {
-  background: linear-gradient(150deg, #0b282c 0%, #17434a 58%, #1c6068 100%);
+  background: linear-gradient(150deg, #0c1c38 0%, #16305a 58%, #26477c 100%);
 }
 
-.band__media--designed {
-  background: radial-gradient(60% 80% at 82% 8%, rgba(215, 192, 151, 0.22) 0%, rgba(215, 192, 151, 0) 62%);
-}
 
-html[dir="rtl"] .band__media--designed {
-  background: radial-gradient(60% 80% at 18% 8%, rgba(215, 192, 151, 0.22) 0%, rgba(215, 192, 151, 0) 62%);
-}
-
+html[dir="rtl"] 
 .profile-meta {
   list-style: none;
   margin: 0.35rem 0 0;
@@ -1739,7 +1788,7 @@ html[dir="rtl"] .band__media--designed {
 .chip--onDark {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.22);
-  color: #d9edef;
+  color: #f0e6d5;
 }
 
 /* Mobile header: the in-menu items carry the secondary actions, so the bar
@@ -1823,9 +1872,9 @@ html[dir="rtl"] .search-strip__field .select {
 }
 
 .notice--info {
-  background: var(--brand-tint);
-  border-color: #c6e2e4;
-  color: #17434a;
+  background: var(--sand-tint);
+  border-color: #e3d3b6;
+  color: #16305a;
 }
 
 .notice--warn {
@@ -1853,7 +1902,7 @@ html[dir="rtl"] .search-strip__field .select {
   block-size: 20px;
   margin-block-start: 0.15rem;
   flex: none;
-  accent-color: var(--brand-strong);
+  accent-color: var(--accent-strong);
 }
 
 /* Booking entry panel --------------------------------------------------- */
@@ -1866,7 +1915,7 @@ html[dir="rtl"] .search-strip__field .select {
 .price-block__value {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--deep);
+  color: var(--navy);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1888,7 +1937,7 @@ html[dir="rtl"] .search-strip__field .select {
 
 .price-total strong {
   font-size: 1.15rem;
-  color: var(--deep);
+  color: var(--navy);
 }
 
 /* Stepper ---------------------------------------------------------------- */
@@ -1908,7 +1957,7 @@ html[dir="rtl"] .search-strip__field .select {
   display: block;
   block-size: 100%;
   inline-size: 100%;
-  background: var(--brand-strong);
+  background: var(--accent-strong);
   /* scaleX instead of animating width: no layout work per frame, and the fill
      still grows from the reading direction's start edge. */
   transform-origin: 0% 50%;
@@ -1938,14 +1987,14 @@ html[lang|="ar"] .stepper__track span {
 }
 
 .stepper__steps li[aria-current="step"] {
-  color: var(--deep);
+  color: var(--navy);
   font-weight: 700;
 }
 
 .stepper__steps li[data-done="true"] .stepper__dot {
-  background: var(--brand-strong);
+  background: var(--accent-strong);
   color: #fff;
-  border-color: var(--brand-strong);
+  border-color: var(--accent-strong);
 }
 
 .stepper__dot {
@@ -1981,7 +2030,7 @@ html[lang|="ar"] .stepper__track span {
 
 .stepper__foot strong {
   font-size: 1.15rem;
-  color: var(--deep);
+  color: var(--navy);
 }
 
 .summary {
@@ -2007,7 +2056,7 @@ html[lang|="ar"] .stepper__track span {
 .summary dd {
   margin: 0;
   font-weight: 600;
-  color: var(--deep);
+  color: var(--navy);
   text-align: end;
 }
 
@@ -2026,7 +2075,7 @@ html[lang|="ar"] .stepper__track span {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--deep);
+  color: var(--navy);
 }
 
 /* Availability grid on the tutor profile -------------------------------- */
@@ -2047,7 +2096,7 @@ html[lang|="ar"] .stepper__track span {
 }
 
 .avail-day strong {
-  color: var(--deep);
+  color: var(--navy);
   font-size: 0.88rem;
 }
 
@@ -2073,7 +2122,7 @@ html[lang|="ar"] .stepper__track span {
 .plan__price {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--deep);
+  color: var(--navy);
 }
 
 .plan__features {
@@ -2099,7 +2148,7 @@ html[lang|="ar"] .stepper__track span {
   inline-size: 0.5rem;
   block-size: 0.5rem;
   border-radius: 2px;
-  background: var(--brand-light);
+  background: var(--sand);
   transform: rotate(45deg);
 }
 
@@ -2124,16 +2173,12 @@ html[lang|="ar"] .stepper__track span {
 }
 
 .admin-shell__header {
-  background: var(--deep);
+  background: var(--navy);
   color: #fff;
   padding-block: 0.9rem;
 }
 
-.admin-shell__header .kicker {
-  color: var(--brand-light);
-}
-
-.admin-shell__header strong {
+.admin-shell__header .admin-shell__header strong {
   font-size: 1.15rem;
 }
 
@@ -2177,14 +2222,14 @@ html[lang|="ar"] .stepper__track span {
 }
 
 .admin-nav__link:hover {
-  background: var(--brand-tint);
-  color: var(--deep);
+  background: var(--sand-tint);
+  color: var(--navy);
 }
 
 .admin-nav__link.is-active {
   background: #fff;
   border-color: var(--line-strong);
-  color: var(--deep);
+  color: var(--navy);
   box-shadow: var(--shadow-xs);
 }
 
@@ -2214,7 +2259,7 @@ html[lang|="ar"] .stepper__track span {
 .kpi__value {
   font-size: 1.55rem;
   font-weight: 700;
-  color: var(--deep);
+  color: var(--navy);
   line-height: 1.2;
 }
 
@@ -2256,9 +2301,9 @@ html[lang|="ar"] .stepper__track span {
 }
 
 .admin-filter a[aria-current="true"] {
-  background: var(--deep);
+  background: var(--navy);
   color: #fff;
-  border-color: var(--deep);
+  border-color: var(--navy);
 }
 
 .admin-split {
@@ -2316,7 +2361,7 @@ html[lang|="ar"] .stepper__track span {
 }
 
 .bar-chart__track {
-  background: var(--brand-tint);
+  background: var(--sand-tint);
   border-radius: var(--radius-xs);
   height: 0.7rem;
   overflow: hidden;
@@ -2325,7 +2370,7 @@ html[lang|="ar"] .stepper__track span {
 .bar-chart__fill {
   display: block;
   height: 100%;
-  background: var(--brand-strong);
+  background: var(--accent-strong);
 }
 
 /* Timeline used by booking and audit detail views */

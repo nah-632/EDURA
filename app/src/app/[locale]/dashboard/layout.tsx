@@ -45,7 +45,6 @@ export default async function DashboardLayout({
       <header className="admin-shell__header">
         <div className="shell admin-shell__inner">
           <div className="stack-xs">
-            <span className="kicker tracked">{t("dashboard.title")}</span>
             <strong>{t("dashboard.welcome", { name: gate.session.user.fullName })}</strong>
           </div>
           <div className="row" style={{ gap: "0.5rem", alignItems: "center" }}>

@@ -26,7 +26,6 @@ export default async function RegisterPage({ params }: { params: Promise<{ local
     <section className="section">
       <div className="shell auth-layout">
         <div className="stack-sm">
-          <span className="kicker tracked">{t("brand.name")}</span>
           <h2 className="display display--section">{t("auth.welcome")}</h2>
           <p className="lead">{t("brand.statement")}</p>
         </div>

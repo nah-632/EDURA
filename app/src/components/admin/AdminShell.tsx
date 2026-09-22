@@ -31,7 +31,6 @@ export function AdminShell({
       <header className="admin-shell__header">
         <div className="shell admin-shell__inner">
           <div className="stack-xs">
-            <span className="kicker tracked">{t("admin.title")}</span>
             <strong>{title}</strong>
             {subtitle ? <span className="field__hint">{subtitle}</span> : null}
           </div>
@@ -70,7 +69,6 @@ export function AdminDenied({
     <section className="section">
       <div className="shell legal-layout">
         <div className="card stack-sm">
-          <span className="kicker tracked">{t("admin.title")}</span>
           <h1 className="display display--section" style={{ fontSize: "var(--text-h3)" }}>
             {t(headingKey)}
           </h1>

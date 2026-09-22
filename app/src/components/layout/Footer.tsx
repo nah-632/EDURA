@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { createTranslator, type Locale } from "@/lib/i18n";
 import { EduraLogo } from "@/components/brand/EduraLogo";
+import { brandMugUrl } from "@/lib/brand/hero-photo";
 
 export interface FooterProps {
   locale: Locale;
@@ -30,7 +31,7 @@ export function Footer({ locale, whatsappNumber, supportEmail, platformName }: F
           </div>
 
           <div>
-            <h4 className="tracked">{t("footer.forStudents")}</h4>
+            <h4>{t("footer.forStudents")}</h4>
             <nav className="stack-xs">
               <Link href={`/${locale}/tutors`}>{t("nav.tutors")}</Link>
               <Link href={`/${locale}/how`}>{t("nav.how")}</Link>
@@ -40,7 +41,7 @@ export function Footer({ locale, whatsappNumber, supportEmail, platformName }: F
           </div>
 
           <div>
-            <h4 className="tracked">{t("footer.forTutors")}</h4>
+            <h4>{t("footer.forTutors")}</h4>
             <nav className="stack-xs">
               <Link href={`/${locale}/pricing`}>{t("nav.becomeTutor")}</Link>
               <Link href={`/${locale}/tutor/apply`}>{t("tutor.join.step1")}</Link>
@@ -49,7 +50,7 @@ export function Footer({ locale, whatsappNumber, supportEmail, platformName }: F
           </div>
 
           <div>
-            <h4 className="tracked">{t("footer.legal")}</h4>
+            <h4>{t("footer.legal")}</h4>
             <nav className="stack-xs">
               <Link href={`/${locale}/about`}>{t("about.kicker")}</Link>
               <Link href={`/${locale}/legal/terms`}>{t("legal.terms.title")}</Link>
@@ -62,7 +63,7 @@ export function Footer({ locale, whatsappNumber, supportEmail, platformName }: F
           </div>
 
           <div>
-            <h4 className="tracked">{t("footer.contact")}</h4>
+            <h4>{t("footer.contact")}</h4>
             <nav className="stack-xs">
               <a href={`https://wa.me/${waDigits}`} target="_blank" rel="noopener noreferrer">
                 {t("legal.contact.whatsapp")}
@@ -74,9 +75,24 @@ export function Footer({ locale, whatsappNumber, supportEmail, platformName }: F
         </div>
 
         <div className="site-footer__bottom">
-          <span>
-            © {year} {platformName} — {t("footer.rights")}
-          </span>
+          <div className="site-footer__sig">
+            {/* The product shot is a brand asset, not content: it sits in the
+                footer at signature size rather than competing on the landing
+                flow. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="site-footer__mug"
+              src={brandMugUrl()}
+              alt=""
+              width={900}
+              height={502}
+              loading="lazy"
+              decoding="async"
+            />
+            <span>
+              © {year} {platformName} — {t("footer.rights")}
+            </span>
+          </div>
           <span>{t("footer.disclaimer")}</span>
         </div>
       </div>

@@ -22,7 +22,6 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
     <section className="section">
       <div className="shell legal-layout">
         <header className="stack-sm">
-          <span className="kicker tracked">{t("nav.contact")}</span>
           <h1 className="display display--section">{t("legal.contact.title")}</h1>
           <p className="lead">{t("legal.contact.body")}</p>
         </header>

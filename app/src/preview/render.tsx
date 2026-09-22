@@ -31,6 +31,7 @@ import {
 } from "@/components/home/Sections";
 import { TutorCard } from "@/components/tutors/TutorCard";
 import { TutorProfileHeader } from "@/components/tutors/TutorProfileHeader";
+import { bandPhotoUrl, heroPhotoUrl } from "@/lib/brand/hero-photo";
 import { createTranslator, localeDir, localeMeta, type Locale } from "@/lib/i18n";
 import { demoAreas, demoStages, demoSubjects, DEMO_TUTORS } from "@/lib/data/demo";
 
@@ -51,7 +52,7 @@ function page(locale: Locale): string {
         subjects={subjects}
         stages={stages}
         areas={areas}
-        photoUrl={null}
+        photoUrl={heroPhotoUrl()}
       />
       <HowItWorks locale={locale} />
       <section className="section" id="tutors">
@@ -66,9 +67,6 @@ function page(locale: Locale): string {
             </div>
             <a className="btn btn--outline btn--sm" href={`/${locale}/tutors`}>
               {t("cta.seeAll")}
-              <span className="btn__arrow" aria-hidden="true">
-                →
-              </span>
             </a>
           </div>
           <div className="grid grid--3">
@@ -84,7 +82,7 @@ function page(locale: Locale): string {
       <WhyEdura locale={locale} />
       <SafetySection locale={locale} />
       <FaqSection locale={locale} />
-      <BecomeTutorBand locale={locale} photoUrl={null} />
+      <BecomeTutorBand locale={locale} photoUrl={bandPhotoUrl()} />
       <FinalCta locale={locale} />
     </>
   );
@@ -174,8 +172,23 @@ const PREVIEW_SCRIPT = `
 })();
 `;
 for (const locale of ["ar", "en"] as Locale[]) {
+  /**
+   * The harness writes files to a directory and opens them from there, so a
+   * root-absolute URL like `/brand/photo/hero.jpg` resolves against the file
+   * system root instead of next to the HTML — the hero photograph showed as a
+   * broken image while the fonts loaded fine (a stylesheet's url() resolves
+   * relative to the CSS file, which is why only the images broke). Rewrite the
+   * asset prefixes to relative paths so the preview renders what the deployed
+   * site renders.
+   */
+  const relativise = (content: string) =>
+    content
+      .replaceAll('src="/brand/', 'src="./brand/')
+      .replaceAll('href="/brand/', 'href="./brand/')
+      .replaceAll('src="/fonts/', 'src="./fonts/');
+
   const html = (content: string) =>
-    content.replace(
+    relativise(content).replace(
       "<body",
       `<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">` +
         `<link rel="stylesheet" href="./${previewCss}?v=${Date.now()}"><script>${PREVIEW_SCRIPT}</script></head><body`,

@@ -14,12 +14,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        deep: { DEFAULT: "#17434A", 700: "#1F545C", 900: "#0E2E33" },
-        brand: { DEFAULT: "#3F9DA5", strong: "#2A6E75", light: "#7FC4CA", tint: "#DFEEEF" },
-        accent: { DEFAULT: "#BF6743", strong: "#9E5231", hover: "#8A4629", tint: "#F8E9E1" },
+        navy: { DEFAULT: "#16305A", 700: "#1E3E6E", 900: "#0F2244" },
+        accent: { DEFAULT: "#BF6743", strong: "#9E5231", hover: "#8A4629", tint: "#F7E9E1" },
         sand: { DEFAULT: "#D7C097", tint: "#F3EADA" },
-        ink: { DEFAULT: "#33383A", soft: "#4A5254", mute: "#666E70" },
-        surface: { DEFAULT: "#FFFFFF", warm: "#FBF8F2", line: "#E7DFD2", strong: "#8B8375" },
+        ink: { DEFAULT: "#2C3956", soft: "#4A5570", mute: "#657087" },
+        surface: { DEFAULT: "#FFFFFF", warm: "#FAF7F1", cream: "#F4EFE4", line: "#E8E0D2", strong: "#8B8375" },
+        brand: "#3F9DA5",
         ok: "#2E7D5B",
         warn: "#8A5410",
         danger: "#B4392C",

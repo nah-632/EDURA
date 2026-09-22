@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Hero } from "@/components/home/Hero";
+import { EmptyState } from "@/components/ui/EmptyState";
 import {
   AboutTeaser,
   BecomeTutorBand,
@@ -78,21 +79,20 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="shell">
           <div className="section__head row--between" style={{ display: "flex", alignItems: "flex-end", gap: "1rem", flexWrap: "wrap", maxWidth: "none" }}>
             <div className="stack-xs">
-              <span className="kicker tracked">{t("home.featured.title")}</span>
               <h2 className="display display--section">{t("home.featured.subtitle")}</h2>
             </div>
             <Link className="btn btn--outline btn--sm" href={`/${locale}/tutors`}>
               {t("cta.seeAll")}
-              <span className="btn__arrow" aria-hidden="true">
-                →
-              </span>
             </Link>
           </div>
 
           {featured.length === 0 ? (
-            <div className="card stack-sm" data-reveal>
-              <h3 style={{ fontSize: "1.05rem" }}>{t("state.emptyTitle")}</h3>
-              <p className="soft">{t("home.featured.empty")}</p>
+            <div data-reveal>
+              <EmptyState
+                title={t("state.emptyTitle")}
+                body={t("home.featured.empty")}
+                action={{ href: `/${locale}/tutors`, label: t("cta.seeAll") }}
+              />
             </div>
           ) : (
             <div className="grid grid--3">

@@ -95,7 +95,6 @@ export default async function TutorsPage({
     <>
       <section className="section section--tight" style={{ background: "#fff", borderBlockEnd: "1px solid var(--line)" }}>
         <div className="shell stack-sm">
-          <span className="kicker tracked">{t("nav.tutors")}</span>
           <h1 className="display display--section">{t("search.title")}</h1>
           <p className="lead">{t("search.subtitle")}</p>
         </div>

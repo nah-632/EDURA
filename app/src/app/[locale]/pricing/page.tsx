@@ -40,19 +40,15 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
 
   return (
     <>
-      <section className="band">
-        <div className="band__scrim" aria-hidden="true" />
+      <section className="band band--light">
         <div className="shell band__inner">
-          <span className="kicker kicker--onDark tracked" data-reveal>
-            {t("nav.becomeTutor")}
-          </span>
-          <h1 className="display display--section display--onDark">
+          <h1 className="display display--section">
             {locale === "ar" ? (
               <>
                 <span data-reveal style={{ "--reveal-i": 1, display: "block" } as React.CSSProperties}>
                   أسعار واضحة
                 </span>
-                <span className="display__em" data-reveal style={{ "--reveal-i": 2, display: "block" } as React.CSSProperties}>
+                <span data-reveal style={{ "--reveal-i": 2, display: "block" } as React.CSSProperties}>
                   بلا أي مفاجآت
                 </span>
               </>
@@ -61,13 +57,13 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
                 <span data-reveal style={{ "--reveal-i": 1, display: "block" } as React.CSSProperties}>
                   Clear pricing.
                 </span>
-                <span className="display__em" data-reveal style={{ "--reveal-i": 2, display: "block" } as React.CSSProperties}>
+                <span data-reveal style={{ "--reveal-i": 2, display: "block" } as React.CSSProperties}>
                   Nothing hidden.
                 </span>
               </>
             )}
           </h1>
-          <p className="lead" style={{ color: "rgba(226,236,255,.88)" }} data-reveal>
+          <p className="lead" data-reveal>
             {t("pricing.lead")}
           </p>
         </div>
@@ -162,7 +158,6 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       <section className="section section--pale">
         <div className="shell">
           <div className="section__head">
-            <span className="kicker tracked">{t("pricing.faq")}</span>
           </div>
           <div className="faq">
             {faqs.map((n, i) => (

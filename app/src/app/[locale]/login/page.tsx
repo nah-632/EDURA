@@ -26,7 +26,6 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
     <section className="section">
       <div className="shell auth-layout">
         <div className="stack-sm">
-          <span className="kicker tracked">{t("brand.name")}</span>
           <h2 className="display display--section">{t("auth.welcomeBack")}</h2>
           <p className="lead">{t("auth.guestBrowsing")}</p>
         </div>

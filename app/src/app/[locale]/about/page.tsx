@@ -48,15 +48,13 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
     <section className="section">
       <div className="shell legal-layout">
         <header className="stack-sm">
-          <span className="kicker tracked">{t("about.kicker")}</span>
           <h1 className="display display--section">{t("about.title")}</h1>
-          <p className="chip chip--gold tracked">{t("about.badge")}</p>
+          <p className="chip chip--gold">{t("about.badge")}</p>
           <p className="lead">{intro}</p>
         </header>
 
         <div className="grid grid--2">
           <article className="card card--accent stack-xs">
-            <span className="kicker tracked">{t("about.families.title")}</span>
             <p className="soft">{families}</p>
             <ul className="stack-xs" style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {familyPoints.map((key) => (
@@ -76,7 +74,6 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           </article>
 
           <article className="card card--accent stack-xs">
-            <span className="kicker tracked">{t("about.tutors.title")}</span>
             <p className="soft">{tutors}</p>
             <ul className="stack-xs" style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {tutorPoints.map((key) => (

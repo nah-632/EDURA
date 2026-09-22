@@ -22,7 +22,6 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
     <section className="section">
       <div className="shell legal-layout">
         <header className="stack-sm">
-          <span className="kicker tracked">{t("nav.about")}</span>
           <h1 className="display display--section">{t("brand.tagline")}</h1>
           <p className="lead">{t("brand.statement")}</p>
         </header>

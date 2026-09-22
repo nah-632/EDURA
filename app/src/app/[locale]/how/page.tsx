@@ -20,7 +20,6 @@ export default async function HowPage({ params }: { params: Promise<{ locale: st
     <>
       <section className="section section--tight" style={{ background: "#fff", borderBlockEnd: "1px solid var(--line)" }}>
         <div className="shell stack-sm">
-          <span className="kicker tracked">{t("home.how.title")}</span>
           <h1 className="display display--section">{t("home.how.subtitle")}</h1>
           <p className="lead">{t("brand.statement")}</p>
         </div>

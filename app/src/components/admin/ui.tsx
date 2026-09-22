@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { EmptyState } from "@/components/ui/EmptyState";
 import { createTranslator, formatMoney, type DictKey, type Locale } from "@/lib/i18n";
 
 /**
@@ -142,10 +143,11 @@ export function DataState({
   }
   if (isEmpty) {
     return (
-      <div className="card stack-xs">
-        <strong>{t(emptyTitle ?? "state.emptyTitle")}</strong>
-        <p className="soft">{t(emptyBody ?? "state.emptyBody")}</p>
-      </div>
+      <EmptyState
+        tone="plain"
+        title={t(emptyTitle ?? "state.emptyTitle")}
+        body={t(emptyBody ?? "state.emptyBody")}
+      />
     );
   }
   return <>{children}</>;
@@ -234,7 +236,6 @@ export function AdminHeading({
   return (
     <div className="row--between" style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap", alignItems: "flex-end" }}>
       <div className="stack-xs">
-        <span className="kicker tracked">{kicker}</span>
         <h1 className="display display--section" style={{ fontSize: "var(--text-h3)" }}>
           {title}
         </h1>

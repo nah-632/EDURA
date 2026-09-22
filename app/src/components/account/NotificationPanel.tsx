@@ -11,6 +11,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { EmptyState } from "@/components/ui/EmptyState";
 import { createTranslator, formatDateTime, type Locale } from "@/lib/i18n";
 import { errorKeyFor } from "@/lib/i18n/api-errors";
 
@@ -62,10 +63,7 @@ export function NotificationPanel({
 
   if (items.length === 0) {
     return (
-      <div className="card stack-xs">
-        <strong>{t("state.emptyTitle")}</strong>
-        <p className="soft">{t("notifications.empty")}</p>
-      </div>
+      <EmptyState tone="plain" title={t("state.emptyTitle")} body={t("notifications.empty")} />
     );
   }
 

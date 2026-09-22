@@ -95,19 +95,19 @@ export default async function LocaleLayout({
   return (
     <html lang={localeMeta[typedLocale].htmlLang} dir={localeDir[typedLocale]} className="no-js">
       <body>
-        {/* Preloads for the display faces that paint the hero headline: Poppins
-            for Latin, Reem Kufi for Arabic. The previous pair (Fraunces/Amiri)
+        {/* Preloads for the display faces that paint the hero headline: Fraunces
+            for Latin, El Messiri for Arabic. The previous pair (Fraunces/Amiri)
             belonged to brand v1 and 404'd on every page load after the re-skin. */}
         <link
           rel="preload"
-          href="/fonts/poppins/pxiByp8kv8JHgFVrLEj6Z1xlFd2JQEk.woff2"
+          href="/fonts/fraunces/6NU78FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0KxC9TeP2Xz5c.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
         />
         <link
           rel="preload"
-          href="/fonts/reem-kufi/2sDcZGJLip7W2J7v7wQzbWW5Kb8VZBHR.woff2"
+          href="/fonts/el-messiri/K2F0fZBRmr9vQ1pHEey6MoiAAgDwbWu1jw.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
