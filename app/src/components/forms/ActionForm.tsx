@@ -19,40 +19,55 @@ import { useRouter } from "next/navigation";
 import { createTranslator, type Locale } from "@/lib/i18n";
 import { errorKeyFor } from "@/lib/i18n/api-errors";
 
+/**
+ * Properties every visible field shares.
+ *
+ * These used to be repeated per variant, and `textarea` and `select` had
+ * quietly drifted: the submit handler reads `field.required` on the union of
+ * all visible kinds, and call sites pass `required: true` to textareas — so the
+ * type said one thing, the code did another, and nothing caught it until the
+ * first `next build` (Vercel, 2026-09-21). One shared base is what stops that
+ * drift; the compile error was the symptom, the duplication was the cause.
+ *
+ * `hidden` is deliberately NOT part of this base: it is filtered out before any
+ * of the shared properties are read, and it has no label.
+ */
+type FieldCommon = {
+  name: string;
+  label: string;
+  help?: string;
+  required?: boolean;
+};
+
 export type FormField =
-  | {
+  | (FieldCommon & {
       kind: "text" | "password" | "url" | "email";
-      name: string;
-      label: string;
       value?: string | null;
       placeholder?: string;
-      help?: string;
-      required?: boolean;
       maxLength?: number;
       autoComplete?: string;
       dir?: "ltr" | "rtl";
-    }
-  | {
+    })
+  | (FieldCommon & {
       kind: "number";
-      name: string;
-      label: string;
       value?: number | null;
       min?: number;
       max?: number;
       step?: number;
-      help?: string;
-      required?: boolean;
-    }
-  | { kind: "textarea"; name: string; label: string; value?: string | null; rows?: number; help?: string; maxLength?: number }
-  | { kind: "checkbox"; name: string; label: string; value?: boolean; help?: string }
-  | {
+    })
+  | (FieldCommon & {
+      kind: "textarea";
+      value?: string | null;
+      rows?: number;
+      maxLength?: number;
+      dir?: "ltr" | "rtl";
+    })
+  | (FieldCommon & { kind: "checkbox"; value?: boolean })
+  | (FieldCommon & {
       kind: "select";
-      name: string;
-      label: string;
       value?: string | null;
       options: { value: string; label: string }[];
-      help?: string;
-    }
+    })
   | { kind: "hidden"; name: string; value: string };
 
 export interface ActionFormProps {
@@ -205,11 +220,16 @@ export function ActionForm({
           return (
             <label className="field" key={field.name}>
               <span className="label">{field.label}</span>
+              {/* `required` is declared on the shared base type and read by the
+                  submit handler; rendering it here too is what keeps the two
+                  honest. */}
               <textarea
                 className="textarea"
                 name={field.name}
                 rows={field.rows ?? 3}
                 maxLength={field.maxLength}
+                dir={field.dir}
+                required={field.required}
                 defaultValue={field.value ?? ""}
               />
               {field.help ? <span className="field__hint">{field.help}</span> : null}

@@ -13,6 +13,7 @@
     "check:client": "node scripts/check-client-boundary.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:css": "node scripts/check-css.mjs",
+    "check:fields": "node scripts/check-field-props.mjs",
     "check:imports": "node scripts/check-imports.mjs",
     "check:row-types": "node scripts/check-row-types.mjs",
     "check:syntax": "find src -name '*.ts' -o -name '*.tsx' | xargs esbuild --outdir=.tmp-check --jsx=automatic --log-level=warning",

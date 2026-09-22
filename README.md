@@ -84,6 +84,7 @@ npm run check:contrast   # WCAG AA over the token palette (21 pairs)
 npm run check:imports    # resolves every route's full import graph
 npm run check:client     # no server-only module reaches a client bundle
 npm run check:row-types  # status columns are never typed as bare strings
+npm run check:fields     # form field literals match the FormField union
 ```
 
 ## Brand
