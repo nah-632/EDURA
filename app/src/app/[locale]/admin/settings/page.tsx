@@ -4,6 +4,7 @@ import { AdminDenied } from "@/components/admin/AdminShell";
 import { ActionForm } from "@/components/forms/ActionForm";
 import { AdminHeading } from "@/components/admin/ui";
 import { adminGate } from "@/lib/admin/guard";
+import { getLaunchOfferStatus } from "@/lib/offers/launch";
 import { getGuaranteeConfig, getSettings } from "@/lib/settings";
 import { dbConfigured } from "@/lib/db";
 import { createTranslator, resolveLocale } from "@/lib/i18n";
@@ -28,7 +29,11 @@ export default async function AdminSettingsPage({ params }: { params: Promise<{ 
   }
 
   const t = createTranslator(locale);
-  const [settings, guarantee] = await Promise.all([getSettings(), getGuaranteeConfig()]);
+  const [settings, guarantee, launchOffer] = await Promise.all([
+    getSettings(),
+    getGuaranteeConfig(),
+    getLaunchOfferStatus(),
+  ]);
 
   return (
     <div className="admin-section">
