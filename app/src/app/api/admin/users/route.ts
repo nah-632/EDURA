@@ -44,29 +44,37 @@ export async function POST(request: Request): Promise<Response> {
   if (!gate.ok) return gate.response;
 
   try {
-    // Narrow on the ACCOUNT actions rather than the role ones. Written the other
-    // way round, `input.reason` below did not narrow and the build failed with
-    // "Property 'reason' does not exist"; checking the variant that needs the
-    // property is both clearer and what the checker actually follows.
-    if (
-      input.action === "restrict" ||
-      input.action === "suspend" ||
-      input.action === "reactivate"
-    ) {
-      const result = await applyUserAction(gate.ctx, {
-        userId: input.userId,
-        action: input.action,
-        reason: input.reason ?? null,
-      });
-      return jsonResponse({ ok: true, ...result });
+    // An exhaustive switch on the discriminant, not an if with a fall-through.
+    // With if/return the checker kept BOTH union members visible in the
+    // remaining branch - which cost two deploys, first on `input.reason` then
+    // on `input.roleCode`. Listing every literal member narrows each case
+    // precisely, and that is the whole point of a discriminated union.
+    switch (input.action) {
+      case "restrict":
+      case "suspend":
+      case "reactivate": {
+        const result = await applyUserAction(gate.ctx, {
+          userId: input.userId,
+          action: input.action,
+          reason: input.reason ?? null,
+        });
+        return jsonResponse({ ok: true, ...result });
+      }
+      case "grant_role":
+      case "revoke_role": {
+        const result = await assignUserRole(gate.ctx, {
+          userId: input.userId,
+          roleCode: input.roleCode,
+          grant: input.action === "grant_role",
+        });
+        return jsonResponse({ ok: true, ...result });
+      }
+      default:
+        // Unreachable: bodySchema is a discriminated union over exactly these
+        // five actions. Kept so the handler has a response for every path if
+        // the schema ever widens.
+        return jsonResponse({ ok: false, error: "unexpected_action" }, 400);
     }
-
-    const result = await assignUserRole(gate.ctx, {
-      userId: input.userId,
-      roleCode: input.roleCode,
-      grant: input.action === "grant_role",
-    });
-    return jsonResponse({ ok: true, ...result });
   } catch (err) {
     return actionErrorResponse(err);
   }
