@@ -101,11 +101,28 @@ const ORDER_BY: Record<NonNullable<TutorFilters["sort"]>, string> = {
  * Filtered, paginated listing. Filter values arrive as codes from the URL and
  * are compared against reference codes (never string-concatenated into SQL).
  */
+/**
+ * Whether the demo fixtures may stand in for the database.
+ *
+ * They exist for the local preview and the static harness. In PRODUCTION a
+ * missing or unreachable database must produce a genuine empty state, never a
+ * fabricated one: the fixture tutors carry names, ratings ("4.80, 24 reviews"),
+ * experience and prices, and a family could act on them.
+ *
+ * This is the rule §33 states and the file header already claimed. Enforcing it
+ * here is what makes that claim true — the check used to be `!dbConfigured()`
+ * alone, so a production deploy that was merely missing DATABASE_URL served the
+ * fixtures as if they were real tutors.
+ */
+function demoAllowed(): boolean {
+  return process.env.NODE_ENV !== "production" && !dbConfigured();
+}
+
 export async function listPublicTutors(
   locale: Locale,
   filters: TutorFilters = {},
 ): Promise<TutorCardData[]> {
-  if (!dbConfigured()) {
+  if (demoAllowed()) {
     const demo = DEMO_TUTORS[locale];
     return filters.limit ? demo.slice(0, filters.limit) : demo;
   }
@@ -194,20 +211,23 @@ export async function listPublicTutors(
   try {
     const rows = await query<TutorRow>(sql, params);
     return rows.map(mapTutor);
-  } catch {
-    return DEMO_TUTORS[locale];
+  } catch (err) {
+    // A read failure is an empty result, not an invented one. The page still
+    // renders (its empty state), the operator sees the cause in the logs.
+    console.error("[tutors] listPublicTutors failed:", err instanceof Error ? err.message : err);
+    return [];
   }
 }
 
 export async function countPublicTutors(filters: TutorFilters = {}): Promise<number> {
-  if (!dbConfigured()) return DEMO_TUTORS.ar.length;
+  if (demoAllowed()) return DEMO_TUTORS.ar.length;
   const rows = await listPublicTutors("en", { ...filters, limit: 48, offset: 0 });
   return rows.length;
 }
 
 /** Single tutor by slug or id; returns null when not publicly listable. */
 export async function getPublicTutor(locale: Locale, slug: string): Promise<TutorCardData | null> {
-  if (!dbConfigured()) {
+  if (demoAllowed()) {
     return DEMO_TUTORS[locale].find((t) => t.slug === slug) ?? null;
   }
   const rows = await query<TutorRow>(
