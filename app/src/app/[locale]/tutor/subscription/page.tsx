@@ -5,6 +5,7 @@ import { StatusPill } from "@/components/admin/ui";
 import { requirePageSession } from "@/lib/auth/server";
 import { listPlans } from "@/lib/data/catalog";
 import { getTutorSubscriptionView } from "@/lib/subscriptions/service";
+import { getLaunchOfferStatus } from "@/lib/offers/launch";
 import { getSettings } from "@/lib/settings";
 import { dbConfigured } from "@/lib/db";
 import { createTranslator, formatDateTime, formatMoney, resolveLocale, type DictKey } from "@/lib/i18n";
@@ -29,10 +30,11 @@ export default async function TutorSubscriptionPage({ params }: { params: Promis
 
   const tutorId = gate.session.user.tutorId!;
   const dbReady = dbConfigured();
-  const [view, plans, settings] = await Promise.all([
+  const [view, plans, settings, launchOffer] = await Promise.all([
     dbReady ? getTutorSubscriptionView(tutorId).catch(() => null) : Promise.resolve(null),
     listPlans(locale),
     getSettings(),
+    getLaunchOfferStatus(),
   ]);
 
   const current = view?.subscription ?? null;
@@ -62,6 +64,21 @@ export default async function TutorSubscriptionPage({ params }: { params: Promis
         </h1>
         <p className="field__hint">{t("tutor.subscription.renewHelp")}</p>
       </div>
+
+      {/* The launch offer, where a tutor actually looks for pricing. Shown only
+          while it is on AND a place is left, so it never promises a slot that
+          has already gone. */}
+      {launchOffer.active ? (
+        <p className="notice notice--info">
+          {t("pricing.launch.body", { limit: launchOffer.limit })}{" "}
+          <strong>
+            {t("pricing.launch.remaining", {
+              remaining: launchOffer.remaining,
+              limit: launchOffer.limit,
+            })}
+          </strong>
+        </p>
+      ) : null}
 
       <div className="card stack-sm">
         <div className="row" style={{ gap: "0.5rem", flexWrap: "wrap" }}>

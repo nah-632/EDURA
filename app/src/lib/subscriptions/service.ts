@@ -151,6 +151,13 @@ export async function activateSubscription(params: {
   planId: string;
   subscriptionId?: string | null;
   now?: Date;
+  /**
+   * Price to record instead of the plan price. Used by the launch offer, where
+   * the activation is free: the row has to say 0, because `subscriptions.price`
+   * is the record of what was charged and the launch counter is derived from
+   * exactly that value.
+   */
+  priceOverride?: string | null;
 }): Promise<{ startsAt: Date; expiresAt: Date; graceUntil: Date }> {
   const now = params.now ?? new Date();
   const plan = await queryOne<{ duration_days: number; grace_days: number; price: string }>(
@@ -178,7 +185,14 @@ export async function activateSubscription(params: {
       await tx.query(
         `insert into subscriptions (tutor_id, plan_id, status, price, starts_at, expires_at, grace_until)
          values ($1, $2, 'active', $3::numeric, $4, $5, $6)`,
-        [params.tutorId, params.planId, plan.price, window.startsAt, window.expiresAt, window.graceUntil],
+        [
+          params.tutorId,
+          params.planId,
+          params.priceOverride ?? plan.price,
+          window.startsAt,
+          window.expiresAt,
+          window.graceUntil,
+        ],
       );
     }
     // An expired listing comes back the moment the subscription is active.

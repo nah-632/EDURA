@@ -41,6 +41,14 @@ export default async function AdminCmsPage({ params }: { params: Promise<{ local
         fields={[
           { kind: "text", name: "heroTitleAr", label: `${t("home.hero.title")} (AR)`, value: cms.heroTitleAr, maxLength: 160 },
           { kind: "text", name: "heroTitleEn", label: `${t("home.hero.title")} (EN)`, value: cms.heroTitleEn, maxLength: 160, dir: "ltr" },
+          // Promo banner: the text AND the switch. It is the operator's
+          // announcement surface — a launch offer, a holiday schedule — and it
+          // must not need a deploy to change.
+          { kind: "textarea", name: "promoBannerAr", label: `${t("admin.cms.promoBanner")} (AR)`, value: cms.promoBannerAr, rows: 2, maxLength: 300 },
+          { kind: "textarea", name: "promoBannerEn", label: `${t("admin.cms.promoBanner")} (EN)`, value: cms.promoBannerEn, rows: 2, maxLength: 300, dir: "ltr" },
+          { kind: "checkbox", name: "promoActive", label: t("admin.cms.promoActive"), value: Boolean(cms.promoActive) },
+          // The hero fields below are grouped with the banner because they are
+          // both "what the homepage says first".
           { kind: "textarea", name: "heroLeadAr", label: `${t("home.hero.lead")} (AR)`, value: cms.heroLeadAr, rows: 2 },
           { kind: "textarea", name: "heroLeadEn", label: `${t("home.hero.lead")} (EN)`, value: cms.heroLeadEn, rows: 2 },
         ]}

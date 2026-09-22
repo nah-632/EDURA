@@ -21,6 +21,7 @@ import { paymentProvider } from "@/lib/providers";
 import { writeAudit, writeAuditTx } from "@/lib/security/audit";
 import type { Permission } from "@/lib/security/rbac";
 import { requiresReason } from "@/lib/security/rbac";
+import { getLaunchOfferStatus, launchOfferApplies, tutorHasClaimedLaunchOffer } from "@/lib/offers/launch";
 import { activateSubscription, getLatestSubscription } from "@/lib/subscriptions/service";
 import type { AdminContext } from "./guard";
 
@@ -233,12 +234,22 @@ export async function activateTutorSubscription(
   ]);
   if (!tutor) throw new ActionError("not_found");
 
+  // The launch offer is decided HERE, from the current counter, not from a flag
+  // the caller passed in: two admins activating at the same moment must not both
+  // believe there was a slot left.
+  const [offer, alreadyClaimed] = await Promise.all([
+    getLaunchOfferStatus(),
+    tutorHasClaimedLaunchOffer(params.tutorId),
+  ]);
+  const free = launchOfferApplies(offer, alreadyClaimed);
+
   const window = await withTransaction(async (tx: TxClient) => {
     const activated = await activateSubscription({
       tx,
       tutorId: params.tutorId,
       planId: params.planId,
       subscriptionId: params.subscriptionId ?? null,
+      priceOverride: free ? "0" : null,
     });
     if (params.recordPayment) {
       // A subscription paid outside the platform (cash, transfer) is recorded

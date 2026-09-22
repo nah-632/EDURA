@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
 import { Header } from "@/components/layout/Header";
+import { PromoBanner } from "@/components/layout/PromoBanner";
 import { Footer } from "@/components/layout/Footer";
 import { MotionRoot } from "@/components/motion/MotionRoot";
 import { createTranslator, localeDir, localeMeta, locales, type Locale } from "@/lib/i18n";
@@ -94,17 +95,19 @@ export default async function LocaleLayout({
   return (
     <html lang={localeMeta[typedLocale].htmlLang} dir={localeDir[typedLocale]} className="no-js">
       <body>
-        {/* Preloads for the two display faces that paint the hero headline. */}
+        {/* Preloads for the display faces that paint the hero headline: Poppins
+            for Latin, Reem Kufi for Arabic. The previous pair (Fraunces/Amiri)
+            belonged to brand v1 and 404'd on every page load after the re-skin. */}
         <link
           rel="preload"
-          href="/fonts/fraunces/6NU78FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0KxC9TeP2Xz5c.woff2"
+          href="/fonts/poppins/pxiByp8kv8JHgFVrLEj6Z1xlFd2JQEk.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
         />
         <link
           rel="preload"
-          href="/fonts/amiri/J7acnpd8CGxBHp2VkaY6zp5gGDAbnCA.woff2"
+          href="/fonts/reem-kufi/2sDcZGJLip7W2J7v7wQzbWW5Kb8VZBHR.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
@@ -114,6 +117,10 @@ export default async function LocaleLayout({
         <a className="skip-link" href="#main">
           {t("a11y.skipToContent")}
         </a>
+
+        {/* Operator-controlled announcement. Renders nothing unless the CMS
+            switch is on and a banner exists for this language. */}
+        <PromoBanner locale={typedLocale} />
 
         <Header
           locale={typedLocale}

@@ -975,6 +975,45 @@ html[dir="rtl"] .band__scrim {
 }
 
 /* --------------------------------------------------------------------------
+   Promo banner (operator-controlled, CMS text)
+   --------------------------------------------------------------------------
+   Sits above the sticky header, so it scrolls away and never eats viewport on
+   a phone. Turquoise, not terracotta: it is an announcement, and the terracotta
+   is reserved for actions.
+   -------------------------------------------------------------------------- */
+.promo-banner {
+  background: var(--deep);
+  color: #fff;
+  border-block-end: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.promo-banner__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding-block: 0.55rem;
+  text-align: center;
+}
+
+.promo-banner__dot {
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-light);
+  flex: none;
+  box-shadow: 0 0 0 4px rgba(127, 196, 202, 0.22);
+}
+
+.promo-banner__text {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+/* --------------------------------------------------------------------------
    Site header / footer
    -------------------------------------------------------------------------- */
 .site-header {

@@ -207,6 +207,11 @@ export const settingsSchema = z.object({
   guaranteeClaimWindowHours: z.number().int().min(1).max(720),
   guaranteeMaxCompletedSessions: z.number().int().min(0).max(10),
   guaranteeReplacementSessions: z.number().int().min(1).max(5),
+  // Bounded on purpose: a 100% commission or a 10 000-tutor launch offer is a
+  // support incident, not a policy.
+  commissionPercent: z.number().int().min(0).max(50),
+  launchOfferEnabled: z.boolean(),
+  launchOfferTutorLimit: z.number().int().min(0).max(1000),
 });
 
 export const notificationComposeSchema = z.object({

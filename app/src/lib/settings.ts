@@ -31,6 +31,19 @@ export interface PlatformSettings {
   guaranteeClaimWindowHours: number;
   guaranteeMaxCompletedSessions: number;
   guaranteeReplacementSessions: number;
+  /**
+   * Platform commission on a lesson fee, as a percentage.
+   *
+   * Commercial policy, so it is data rather than a constant: §29 requires the
+   * architecture to carry a commission without rebuilding booking/payment, and
+   * the public copy on the pricing page and in the tutor terms reads this same
+   * number — which is why saying "no commission" in one place while charging
+   * 20% in another is not possible.
+   */
+  commissionPercent: number;
+  /** Launch offer: the first N tutors are not charged a subscription. */
+  launchOfferEnabled: boolean;
+  launchOfferTutorLimit: number;
 }
 
 export const SETTINGS_KEY = "platform";
@@ -53,6 +66,9 @@ export function defaultSettings(): PlatformSettings {
     guaranteeClaimWindowHours: 48,
     guaranteeMaxCompletedSessions: 1,
     guaranteeReplacementSessions: 1,
+    commissionPercent: 20,
+    launchOfferEnabled: true,
+    launchOfferTutorLimit: 15,
   };
 }
 

@@ -62,6 +62,12 @@ export default async function AdminSettingsPage({ params }: { params: Promise<{ 
           { kind: "number", name: "cancellationHours", label: t("admin.settings.cancellationHours"), value: settings.cancellationHours, min: 0, max: 168 },
           { kind: "number", name: "minLeadTimeHours", label: t("admin.settings.minLeadTimeHours"), value: settings.minLeadTimeHours, min: 0, max: 720 },
           { kind: "number", name: "maxAdvanceDays", label: t("admin.settings.maxAdvanceDays"), value: settings.maxAdvanceDays, min: 1, max: 365 },
+          // Commercial policy. The commission rate is read by the public copy on
+          // the pricing page and in the tutor terms, so changing it here changes
+          // what the platform says it charges — they cannot disagree.
+          { kind: "number", name: "commissionPercent", label: t("admin.settings.commissionPercent"), value: settings.commissionPercent, min: 0, max: 50, help: `0–50 · ${100 - settings.commissionPercent}% ${t("admin.settings.tutorShare")}` },
+          { kind: "checkbox", name: "launchOfferEnabled", label: t("admin.settings.launchOfferEnabled"), value: settings.launchOfferEnabled },
+          { kind: "number", name: "launchOfferTutorLimit", label: t("admin.settings.launchOfferTutorLimit"), value: settings.launchOfferTutorLimit, min: 0, max: 1000, help: launchOffer.enabled ? t("admin.settings.launchOfferUsed", { claimed: launchOffer.claimed, remaining: launchOffer.remaining }) : t("admin.settings.launchOfferOff") },
           {
             kind: "checkbox",
             name: "reviewModeration",
