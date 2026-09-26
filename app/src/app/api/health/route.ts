@@ -32,6 +32,38 @@ const REQUIRED = [
   "SUPPORT_EMAIL",
 ] as const;
 
+/**
+ * The shape of the configured connection string, never its secret parts.
+ *
+ * `dns_not_found` says the hostname does not resolve, but not *why* — and the
+ * three ways an operator gets there (a trailing quote, a leading variable name,
+ * a stray newline) all look identical from outside. This reports only what is
+ * needed to tell those apart: the parsed host, the port, and three booleans.
+ * The user, the password and the database name are never returned.
+ */
+function connectionShape(): Record<string, unknown> | null {
+  const raw = process.env.DATABASE_URL;
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  const out: Record<string, unknown> = {
+    hasSurroundingQuotes: /^["']|["']$/.test(trimmed),
+    hasVariableNamePrefix: /^(?:export\s+)?DATABASE_URL\s*=/.test(trimmed),
+    hasWhitespaceInside: /\s/.test(trimmed),
+    startsWithPostgresScheme: /^postgres(ql)?:\/\//.test(trimmed),
+  };
+  try {
+    const url = new URL(trimmed.replace(/^["']|["']$/g, ""));
+    out.host = url.hostname;
+    out.port = url.port || "(default)";
+    out.database = url.pathname.replace(/^\//, "") || "(none)";
+    out.userLooksLikeSupabasePooler = /^postgres\.[a-z]{20}$/.test(decodeURIComponent(url.username));
+  } catch {
+    out.host = null;
+    out.parseError = "the value is not a parseable URL";
+  }
+  return out;
+}
+
 function classify(err: unknown): string {
   const message = err instanceof Error ? err.message : String(err);
   const code = (err as { code?: string })?.code ?? "";
@@ -62,6 +94,7 @@ export async function GET(): Promise<Response> {
   let tutors: number | null = null;
   let subjects: number | null = null;
   let databaseError: string | null = null;
+  let connection: Record<string, unknown> | null = null;
 
   if (dbConfigured()) {
     try {
@@ -82,6 +115,7 @@ export async function GET(): Promise<Response> {
     } catch (err) {
       database = "unreachable";
       databaseError = classify(err);
+      connection = connectionShape();
     }
   }
 
@@ -99,6 +133,7 @@ export async function GET(): Promise<Response> {
       missing,
       database,
       databaseError,
+      connection,
       data: { tables, subjects, tutors },
     },
     200,
