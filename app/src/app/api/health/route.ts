@@ -1,4 +1,4 @@
-import { dbConfigured, queryOne } from "@/lib/db";
+import { dbConfigured, getPool } from "@/lib/db";
 import { jsonResponse } from "@/lib/security/http";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +32,22 @@ const REQUIRED = [
   "SUPPORT_EMAIL",
 ] as const;
 
+function classify(err: unknown): string {
+  const message = err instanceof Error ? err.message : String(err);
+  const code = (err as { code?: string })?.code ?? "";
+  const hay = `${code} ${message}`.toLowerCase();
+  if (/enotfound|eai_again|getaddrinfo/.test(hay)) return "dns_not_found";
+  if (/econnrefused/.test(hay)) return "connection_refused";
+  if (/etimedout|connection timeout|timeout expired/.test(hay)) return "timeout";
+  if (/28p01|password authentication failed|sasl|role .* does not exist|invalid_authorization/.test(hay))
+    return "auth_failed";
+  if (/invalid url|uri malformed|invalid connection string|parse/.test(hay))
+    return "malformed_connection_string";
+  if (/self.signed|certificate|tls|ssl/.test(hay)) return "tls";
+  if (/no pg_hba|not allowed|ehostunreach|enetunreach/.test(hay)) return "network_blocked";
+  return "unknown";
+}
+
 export async function GET(): Promise<Response> {
   const present: Record<string, boolean> = {};
   const missing: string[] = [];
@@ -49,7 +65,10 @@ export async function GET(): Promise<Response> {
 
   if (dbConfigured()) {
     try {
-      const counts = await queryOne<{ tables: number; subjects: number; tutors: number }>(
+      // The pool directly, NOT the app's `query()` helper: that helper maps
+      // driver failures to a deliberately opaque `database_error`, which is
+      // right for a user-facing response and useless for diagnosis.
+      const result = await getPool().query<{ tables: number; subjects: number; tutors: number }>(
         `select
            (select count(*)::int from information_schema.tables
              where table_schema = 'public' and table_type = 'BASE TABLE') as tables,
@@ -57,14 +76,12 @@ export async function GET(): Promise<Response> {
            (select count(*)::int from tutors) as tutors`,
       );
       database = "connected";
-      tables = counts?.tables ?? null;
-      subjects = counts?.subjects ?? null;
-      tutors = counts?.tutors ?? null;
+      tables = result.rows[0]?.tables ?? null;
+      subjects = result.rows[0]?.subjects ?? null;
+      tutors = result.rows[0]?.tutors ?? null;
     } catch (err) {
       database = "unreachable";
-      // The driver message names the host or the SQLSTATE — useful to the
-      // operator, and it contains no credential.
-      databaseError = err instanceof Error ? err.message : String(err);
+      databaseError = classify(err);
     }
   }
 
