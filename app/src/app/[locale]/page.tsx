@@ -44,7 +44,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   ]);
   const guaranteeNumbers = guaranteeSummary(guarantee);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://edura.bh";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://edura.world";
   const faq = [1, 2, 3, 4, 5].map((i) => ({
     question: t(`home.faq.q${i}` as never),
     answer: t(`home.faq.a${i}` as never),

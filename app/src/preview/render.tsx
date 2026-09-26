@@ -92,7 +92,7 @@ function page(locale: Locale): string {
       <body>
         <Header locale={locale} />
         <main id="main">{body}</main>
-        <Footer locale={locale} platformName={t("brand.name")} whatsappNumber="+97366661238" supportEmail="support@edura.bh" />
+        <Footer locale={locale} platformName={t("brand.name")} whatsappNumber="+97366661238" supportEmail="support@edura.world" />
       </body>
     </html>,
   );
@@ -137,7 +137,7 @@ function tutorProfilePage(locale: Locale): string {
             </div>
           </section>
         </main>
-        <Footer locale={locale} platformName={createTranslator(locale)("brand.name")} whatsappNumber="+97366661238" supportEmail="support@edura.bh" />
+        <Footer locale={locale} platformName={createTranslator(locale)("brand.name")} whatsappNumber="+97366661238" supportEmail="support@edura.world" />
       </body>
     </html>,
   );

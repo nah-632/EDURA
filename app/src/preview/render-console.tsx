@@ -63,7 +63,7 @@ function shell(locale: Locale, inner: React.ReactNode, title: string): string {
     { href: "/audit", labelKey: "admin.nav.audit" },
   ];
   return renderToStaticMarkup(
-    <AdminShell locale={locale} title={title} subtitle={t("admin.signInBody")} adminLabel="husain@edura.bh" nav={<AdminNav locale={locale} items={items} />}>
+    <AdminShell locale={locale} title={title} subtitle={t("admin.signInBody")} adminLabel="admin@edura.world" nav={<AdminNav locale={locale} items={items} />}>
       {inner}
     </AdminShell>,
   );
@@ -143,7 +143,7 @@ function overview(locale: Locale) {
                 <li key={action}>
                   <span translate="no">{action}</span>
                   <span className="admin-meta">
-                    <span>husain@edura.bh</span>
+                    <span>admin@edura.world</span>
                     <span className="tnum">20/09 2{i}:1{i}</span>
                   </span>
                 </li>

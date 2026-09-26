@@ -54,7 +54,7 @@ export function defaultSettings(): PlatformSettings {
     platformNameEn: "Edura",
     whatsappNumber: process.env.WHATSAPP_TARGET ?? "+97366661238",
     benefitPayNumber: process.env.BENEFITPAY_NUMBER ?? "+97366661238",
-    supportEmail: process.env.SUPPORT_EMAIL ?? "support@edura.bh",
+    supportEmail: process.env.SUPPORT_EMAIL ?? "support@edura.world",
     supportPhone: process.env.SUPPORT_PHONE ?? process.env.WHATSAPP_TARGET ?? "+97366661238",
     currency: "BHD",
     cancellationHours: 24,
