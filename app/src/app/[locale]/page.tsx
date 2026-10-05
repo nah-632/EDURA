@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Hero } from "@/components/home/Hero";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { WhyEdura } from "@/components/home/WhyEdura";
 import {
   AboutTeaser,
   BecomeTutorBand,
@@ -10,10 +11,8 @@ import {
   GuaranteeBadges,
   Highlights,
   HowItWorks,
-  SafetySection,
   StageStrip,
   SubjectGrid,
-  WhyEdura,
 } from "@/components/home/Sections";
 import { TutorCard } from "@/components/tutors/TutorCard";
 import { createTranslator, type Locale } from "@/lib/i18n";

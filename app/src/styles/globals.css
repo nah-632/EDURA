@@ -391,6 +391,82 @@ html[dir="rtl"] .btn:hover html[dir="rtl"] .btn:hover /* -----------------------
    Hero
    -------------------------------------------------------------------------- */
 /* --------------------------------------------------------------------------
+   Why Edura — a ledger, not a card grid
+   --------------------------------------------------------------------------
+   Refero anti-slop flagged the previous version as four identical cards.
+   This is a numbered manifesto: glyph in brand turquoise, display-face numeral,
+   hairline rule between rows. Fewer boxes, more structure.
+   -------------------------------------------------------------------------- */
+.why__shell {
+  max-width: 46rem;
+}
+
+.why__ledger {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.why__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 1.1rem;
+  align-items: start;
+  padding-block: 1.35rem;
+}
+
+.why__row + .why__row {
+  border-block-start: 1px solid var(--line);
+}
+
+.why__glyph {
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: var(--radius-pill);
+  display: grid;
+  place-items: center;
+  background: #fff;
+  box-shadow: var(--shadow-xs);
+  flex: none;
+}
+
+.why__glyph svg {
+  inline-size: 21px;
+  block-size: 21px;
+}
+
+.why__body {
+  min-inline-size: 0;
+}
+
+.why__title {
+  margin: 0.15rem 0 0.3rem;
+  font-size: 1.06rem;
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.why__text {
+  margin: 0;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.why__num {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--ink-mute);
+  opacity: 0.55;
+}
+
+@media (max-width: 640px) {
+  .why__num {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
    Empty state
    -------------------------------------------------------------------------- */
 .empty-state {

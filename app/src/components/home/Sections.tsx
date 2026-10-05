@@ -12,7 +12,7 @@ import type { Option } from "@/lib/data/catalog";
  * without adding clarity. Anything with behaviour lives in its own file.
  */
 
-function Reveal({
+export function Reveal({
   index,
   className,
   children,
