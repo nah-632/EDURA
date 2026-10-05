@@ -13,6 +13,7 @@ import {
   HowItWorks,
   StageStrip,
   SubjectGrid,
+  SafetySection,
 } from "@/components/home/Sections";
 import { TutorCard } from "@/components/tutors/TutorCard";
 import { createTranslator, type Locale } from "@/lib/i18n";

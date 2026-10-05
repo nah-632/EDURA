@@ -1,5 +1,5 @@
 import { createTranslator, type Locale } from "@/lib/i18n";
-import { Reveal } from "./Reveal";
+import { Reveal } from "./Sections";
 
 /**
  * "Why Edura" — the trust section.
