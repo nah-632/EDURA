@@ -32,6 +32,8 @@ export const PG = {
   CHECK_VIOLATION: "23514",
   NOT_NULL_VIOLATION: "23502",
   INVALID_TEXT_REPRESENTATION: "22P02",
+  /** 0004 guardian gate: booking for a minor without a verified guardian link. */
+  GUARDIAN_REQUIRED: "GD000",
 } as const;
 
 type PgLikeError = { code?: string; constraint?: string; message?: string };
@@ -43,7 +45,9 @@ function toDbError(err: unknown): DbError {
   const message =
     code === PG.EXCLUSION_VIOLATION
       ? "slot_taken"
-      : code === PG.UNIQUE_VIOLATION
+      : code === PG.GUARDIAN_REQUIRED
+        ? "guardian_required"
+        : code === PG.UNIQUE_VIOLATION
         ? "duplicate"
         : code === PG.FOREIGN_KEY_VIOLATION
           ? "invalid_reference"
