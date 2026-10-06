@@ -1,0 +1,107 @@
+name: CI
+
+# Why this exists
+# ---------------
+# `next build` has NEVER been run for this project. Every check that has passed
+# so far (esbuild syntax, the 131 tests, the CSS pipeline, contrast, the import
+# graph) runs without it, so a TypeScript or Next-specific build error would
+# first appear as a failed Vercel deploy — the slowest, least informative place
+# to find one.
+#
+# This workflow runs the real build on a real Linux runner with a real
+# `npm install`, so the answer arrives in GitHub's Actions tab in ~2 minutes
+# instead of in a broken production deploy.
+#
+# The build deliberately runs WITHOUT a database. `dbConfigured()` guards every
+# DB read and the app falls back rather than failing, so a build that needs
+# Postgres is itself a bug worth catching here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: app
+
+jobs:
+  build:
+    name: gates + next build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # Build-time placeholders only. No real secret ever reaches CI: every
+      # value the app needs at build time is public or absent by design.
+      NEXT_PUBLIC_SITE_URL: https://example.invalid
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      # `npm ci` when a lockfile exists, `npm install` otherwise. The lockfile
+      # is not committed yet; the fallback keeps CI useful until it is.
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci --no-audit --no-fund;
+          else npm install --no-audit --no-fund; fi
+
+      # ── the gates that already pass locally ──────────────────────────────
+      - name: Syntax (esbuild over src/**)
+        run: npm run check:syntax
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test
+
+      - name: CSS pipeline (tailwind + cssnano)
+        run: npm run check:css
+
+      - name: Contrast (WCAG AA over the token palette)
+        run: npm run check:contrast
+
+      - name: Import graph
+        run: npm run check:imports
+
+      - name: Client boundary
+        run: npm run check:client
+
+      - name: Row types
+        run: npm run check:row-types
+
+      - name: Field literals (the gate that reproduces the first build failure)
+        run: npm run check:fields
+
+      - name: New symbols defined where used
+        run: npm run check:symbols
+
+      # ── the step this project has never done ─────────────────────────────
+      # `build` runs typecheck + check:fields first, so one run reports every
+      # type error rather than the first one only.
+      - name: next build
+        run: npm run build
+
+      - name: Upload build failure context
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: |
+            app/.next/**/*.log
+            app/npm-debug.log*
+          if-no-files-found: ignore
+          retention-days: 7
