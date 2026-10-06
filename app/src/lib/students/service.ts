@@ -7,6 +7,7 @@
  */
 import { query, queryOne } from "@/lib/db";
 import { writeAudit } from "@/lib/security/audit";
+import { createGuardianLink, type GuardianConsentMeta } from "@/lib/guardian/service";
 
 export interface StudentRecord {
   id: string;
@@ -65,7 +66,11 @@ export async function listStudents(ownerUserId: string): Promise<StudentRecord[]
   }));
 }
 
-export async function createStudent(ownerUserId: string, input: StudentInput): Promise<{ id: string }> {
+export async function createStudent(
+  ownerUserId: string,
+  input: StudentInput,
+  consent?: GuardianConsentMeta,
+): Promise<{ id: string }> {
   const rows = await query<{ id: string }>(
     `insert into students (owner_user_id, full_name, stage_id, grade, gender, birth_year, notes)
      values ($1, $2, $3, $4, $5, $6, $7)
@@ -81,6 +86,16 @@ export async function createStudent(ownerUserId: string, input: StudentInput): P
     ],
   );
   const id = rows[0]!.id;
+  // Slice A+K: a new record is a minor by default (birth_year absent = minor,
+  // per the owner decision). The declaring account becomes the guardian of a
+  // PENDING self_declared link with consent captured from this request, so a
+  // link ALWAYS exists from the first moment of the record's life.
+  await createGuardianLink({
+    guardianUserId: ownerUserId,
+    studentId: id,
+    relationshipType: "other",
+    consent: consent ?? { ip: null, userAgent: null },
+  });
   await writeAudit({
     actorUserId: ownerUserId,
     actorLabel: null,
@@ -88,7 +103,7 @@ export async function createStudent(ownerUserId: string, input: StudentInput): P
     // The audit row records the action, not the child's details.
     entity: "students",
     entityId: id,
-    after: { has_stage: Boolean(input.stageId) },
+    after: { has_stage: Boolean(input.stageId), is_minor: input.birthYear == null },
   });
   return { id };
 }
@@ -140,6 +155,16 @@ export async function deleteStudent(ownerUserId: string, studentId: string): Pro
     [studentId, ownerUserId],
   );
   if (!rows[0]) return false;
+  // Slice A+K: the record is gone — its active guardian links must not stay
+  // verified. Rows are revoked (kept, like the student row, for the audit
+  // story), never deleted.
+  await query(
+    `update guardian_links
+        set verification_status = 'revoked', revoked_at = now(), updated_at = now(),
+            revoke_reason = 'student_record_deleted'
+      where student_id = $1 and verification_status in ('pending', 'verified')`,
+    [studentId],
+  );
   await writeAudit({
     actorUserId: ownerUserId,
     actorLabel: null,

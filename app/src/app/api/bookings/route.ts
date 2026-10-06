@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth/service";
 import { createBookingRequest, SlotTakenError, BookingError } from "@/lib/booking/engine";
 import { SqlBookingStore, bookingStoreAvailable, nextBookingCode } from "@/lib/booking/sqlStore";
-import { query, queryOne } from "@/lib/db";
+import { query, queryOne, withTransaction } from "@/lib/db";
 import { createTranslator, type Locale } from "@/lib/i18n";
 import { apiError, getClientIp, getUserAgent, isSameOrigin, jsonResponse, statusForError } from "@/lib/security/http";
 import { LIMITS, bucketKey, DbRateLimiter } from "@/lib/security/ratelimit";
@@ -103,15 +103,29 @@ export async function POST(request: Request): Promise<Response> {
     if (!lessonType) return apiError("validation", 422, "unknown_lesson_type");
 
     // Student: an existing owned record, or a new one created for this booking.
+    // A new MINOR always gets a guardian link at creation (slice A+K): the
+    // account owner declares the relationship, consent is captured from this
+    // very request (ip + user agent), and verification upgrades it later.
     let studentId = parsed.studentId ?? null;
     if (!studentId) {
       if (!parsed.student?.fullName) return apiError("validation", 422, "student_required");
-      const rows = await query<{ id: string }>(
-        `insert into students (owner_user_id, full_name, notes)
-         values ($1, $2, $3) returning id`,
-        [session.user.id, parsed.student.fullName, parsed.student.notes ?? null],
-      );
-      studentId = rows[0]!.id;
+      const createdStudent = await withTransaction(async (tx) => {
+        const rows = await tx.query<{ id: string }>(
+          `insert into students (owner_user_id, full_name, notes)
+           values ($1, $2, $3) returning id`,
+          [session.user.id, parsed.student!.fullName, parsed.student!.notes ?? null],
+        );
+        await tx.query(
+          `insert into guardian_links
+             (guardian_user_id, student_id, relationship_type, verification_status,
+              verification_method, consent_granted_at, consent_ip, consent_user_agent)
+           values ($1, $2, 'other', 'pending', 'self_declared', now(), $3, $4)
+           on conflict do nothing`,
+          [session.user.id, rows[0]!.id, ip, userAgent],
+        );
+        return rows[0]!;
+      });
+      studentId = createdStudent.id;
     } else {
       const owned = await queryOne<{ id: string }>("select id from students where id = $1 and owner_user_id = $2", [
         studentId,
@@ -132,6 +146,7 @@ export async function POST(request: Request): Promise<Response> {
           minLeadTimeHours: settings.minLeadTimeHours,
           allowedDurations: [30, 45, 60, 90, 120],
         },
+        guardianEnforcementStrict: settings.guardianEnforcementStrict,
         now: () => now,
         today: () => localDateOf(now),
         codeFactory: nextBookingCode,

@@ -14,7 +14,7 @@ import type {
   StudentRow,
   TutorForBooking,
 } from "./engine";
-import { SlotTakenError } from "./engine";
+import { BookingError, SlotTakenError } from "./engine";
 import type { AvailabilityWindow } from "./availability";
 import type { BookingStatus } from "./state";
 import type { TutorStatus } from "@/lib/tutor/status";
@@ -61,14 +61,31 @@ export class SqlBookingStore implements BookingStore {
   }
 
   async getStudent(studentId: string): Promise<StudentRow | null> {
-    const rows = await query<{ id: string; owner_user_id: string; full_name: string; stage_id: string | null }>(
-      `select id, owner_user_id, full_name, stage_id from students where id = $1 and deleted_at is null`,
+    const rows = await query<{ id: string; owner_user_id: string; full_name: string; stage_id: string | null; is_minor: boolean }>(
+      `select id, owner_user_id, full_name, stage_id, is_minor from students where id = $1 and deleted_at is null`,
       [studentId],
     );
     const row = rows[0];
     return row
-      ? { id: row.id, ownerUserId: row.owner_user_id, fullName: row.full_name, stageId: row.stage_id }
+      ? { id: row.id, ownerUserId: row.owner_user_id, fullName: row.full_name, stageId: row.stage_id, isMinor: row.is_minor }
       : null;
+  }
+
+  /**
+   * Slice A+K: one row decides the guardian link (verified outranks pending).
+   * The 0004 trigger enforces the same rule inside SQL for every INSERT.
+   */
+  async getGuardianVerification(studentId: string, guardianUserId: string): Promise<"verified" | "pending" | "none"> {
+    const rows = await query<{ status: "verified" | "pending" }>(
+      `select case bool_or(verification_status = 'verified')
+                 when true then 'verified' else 'pending'
+               end as status
+         from guardian_links
+        where student_id = $1 and guardian_user_id = $2
+          and verification_status in ('pending', 'verified')`,
+      [studentId, guardianUserId],
+    );
+    return rows[0]?.status ?? "none";
   }
 
   async getLessonType(lessonTypeId: string): Promise<LessonTypeRow | null> {
@@ -199,6 +216,11 @@ export class SqlBookingStore implements BookingStore {
     } catch (err) {
       if (err instanceof DbError && err.code === PG.EXCLUSION_VIOLATION) {
         throw new SlotTakenError();
+      }
+      // Slice A+K: the 0004 trigger refused a booking for a minor without a
+      // verified guardian link — surface the same stable code the engine uses.
+      if (err instanceof DbError && err.code === PG.GUARDIAN_REQUIRED) {
+        throw new BookingError("guardian_required");
       }
       throw err;
     }

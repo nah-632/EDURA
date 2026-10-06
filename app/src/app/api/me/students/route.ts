@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { requireUser } from "@/lib/auth/service";
 import { createStudent, deleteStudent, listStudents, updateStudent } from "@/lib/students/service";
-import { apiError, isSameOrigin, jsonResponse } from "@/lib/security/http";
+import { apiError, getClientIp, getUserAgent, isSameOrigin, jsonResponse } from "@/lib/security/http";
 import { studentSchema } from "@/lib/validation/schemas";
 
 export const dynamic = "force-dynamic";
@@ -52,8 +52,14 @@ export async function POST(request: Request): Promise<Response> {
   if (!parsed.success) return apiError("validation", 422);
 
   try {
+    // Slice A+K: consent metadata (ip + user agent) is captured with every
+    // guardian-link creation so the declaration is documented, not anonymous.
+    const consent = {
+      ip: getClientIp(request.headers),
+      userAgent: getUserAgent(request.headers),
+    };
     if (parsed.data.action === "create") {
-      const result = await createStudent(session.user.id, parsed.data.student);
+      const result = await createStudent(session.user.id, parsed.data.student, consent);
       return jsonResponse({ ok: true, ...result }, 201);
     }
     if (parsed.data.action === "update") {

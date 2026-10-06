@@ -86,6 +86,8 @@ export function statusForError(code: string): number {
     case "slot_taken":
     case "duplicate":
       return 409;
+    case "guardian_required":
+      return 422;
     case "rate_limited":
       return 429;
     case "validation":

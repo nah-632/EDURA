@@ -33,6 +33,7 @@ export class BookingError extends Error {
       | "method_not_offered"
       | "lesson_type_not_found"
       | "student_not_owned"
+      | "guardian_required"
       | "availability"
       | "invalid_transition"
       | "duplicate_request",
@@ -70,6 +71,9 @@ export interface StudentRow {
   ownerUserId: string;
   fullName: string;
   stageId: string | null;
+  /** Minors are the protected category: booking them requires a verified
+   *  guardian link once strict enforcement is on (slice A+K). */
+  isMinor: boolean;
 }
 
 export interface CreateBookingRequest {
@@ -99,6 +103,12 @@ export interface BookingRow {
 export interface BookingStore {
   getTutor(tutorId: string): Promise<TutorForBooking | null>;
   getStudent(studentId: string): Promise<StudentRow | null>;
+  /**
+   * Guardian-link status between an account and a student (slice A+K).
+   * Optional so existing in-memory test stores keep compiling; the engine
+   * treats a missing implementation as "no verified link".
+   */
+  getGuardianVerification?(studentId: string, guardianUserId: string): Promise<"verified" | "pending" | "none">;
   getLessonType(lessonTypeId: string): Promise<LessonTypeRow | null>;
   getWindows(tutorId: string): Promise<AvailabilityWindow[]>;
   getTimeOff(tutorId: string, fromDate: string, toDate: string): Promise<{ startsAt: Date; endsAt: Date }[]>;
@@ -125,6 +135,8 @@ export interface BookingStore {
 
 export interface EngineDeps {
   rules: BookingRules;
+  /** Slice A+K: strict guardian-link enforcement is DATA (settings), off during the grace period. */
+  guardianEnforcementStrict?: boolean;
   now(): Date;
   /** Asia/Bahrain date used for the booking-code day component */
   today(): string;
@@ -188,6 +200,19 @@ export async function createBookingRequest(
   // body is never trusted on its own.
   if (!student || student.ownerUserId !== request.customerUserId) {
     throw new BookingError("student_not_owned");
+  }
+
+  // Slice A+K: a booking for a MINOR requires a VERIFIED guardian link held by
+  // the booking account. During the grace period (strict off) this is skipped
+  // here — the 0004 database trigger re-checks it inside SQL with the same
+  // flag, so the two layers can never disagree about whether strict is on.
+  if (student.isMinor && deps.guardianEnforcementStrict === true) {
+    const link = store.getGuardianVerification
+      ? await store.getGuardianVerification(student.id, request.customerUserId)
+      : "none";
+    if (link !== "verified") {
+      throw new BookingError("guardian_required", "minor without a verified guardian link");
+    }
   }
 
   const hourly = tutor.subjectPriceOverride ?? tutor.pricePerHour;

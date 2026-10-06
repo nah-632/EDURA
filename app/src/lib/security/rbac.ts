@@ -32,6 +32,8 @@ export const PERMISSIONS = [
   "settings.manage",
   "role.manage",
   "audit.read",
+  /** Slice A+K: verify or revoke a guardian link for a minor student. */
+  "guardian.verify",
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -56,6 +58,7 @@ export const ROLE_PERMISSIONS: Record<RoleCode, readonly Permission[]> = {
     "review.moderate",
     "notification.send",
     "audit.read",
+    "guardian.verify",
   ],
   support: [
     "overview.read",
