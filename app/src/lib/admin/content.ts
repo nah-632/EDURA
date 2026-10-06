@@ -185,7 +185,7 @@ export interface PlanInput {
   nameAr: string;
   nameEn: string;
   price: string;
-  interval: "monthly" | "annual";
+  interval: "monthly" | "annual" | "one_time";
   durationDays: number;
   graceDays: number;
   isActive: boolean;

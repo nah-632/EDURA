@@ -43,6 +43,9 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
   const familyPoints = ["about.families.p1", "about.families.p2", "about.families.p3", "about.families.p4"] as const;
   const tutorPoints = ["about.tutors.p1", "about.tutors.p2", "about.tutors.p3", "about.tutors.p4"] as const;
+  // The commission is interpolated everywhere it is stated, so the copy cannot
+  // drift from the number the platform actually charges (settings.commissionPercent).
+  const percent = settings.commissionPercent;
 
   return (
     <section className="section">
@@ -81,7 +84,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                   <span aria-hidden="true" style={{ color: "var(--accent-strong)", lineHeight: 1.5 }}>
                     ✓
                   </span>
-                  <span className="soft">{t(key)}</span>
+                  <span className="soft">{t(key, { percent })}</span>
                 </li>
               ))}
             </ul>

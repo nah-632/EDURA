@@ -22,7 +22,7 @@ import { cmsText, readCmsContent } from "@/lib/cms/public";
 import { listAreas, listStages, listSubjects } from "@/lib/data/catalog";
 import { listPublicTutors } from "@/lib/data/tutors";
 import { guaranteeSummary } from "@/lib/guarantee/rules";
-import { getGuaranteeConfig } from "@/lib/settings";
+import { getGuaranteeConfig, getSettings } from "@/lib/settings";
 import { faqJsonLd, organisationJsonLd } from "@/lib/security/jsonld";
 
 // Public marketing page: cacheable, and live tutor availability rides the
@@ -34,15 +34,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const locale = rawLocale as Locale;
   const t = createTranslator(locale);
 
-  const [subjects, stages, areas, featured, cms, guarantee] = await Promise.all([
+  const [subjects, stages, areas, featured, cms, guarantee, settings] = await Promise.all([
     listSubjects(locale),
     listStages(locale),
     listAreas(locale),
     listPublicTutors(locale, { sort: "rating", limit: 3 }),
     readCmsContent(),
     getGuaranteeConfig(),
+    getSettings(),
   ]);
   const guaranteeNumbers = guaranteeSummary(guarantee);
+  // Same pattern as /pricing: the commission figure is read from settings so
+  // the copy cannot drift from what the platform charges.
+  const percent = settings.commissionPercent;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://edura.world";
   const faq = [1, 2, 3, 4, 5].map((i) => ({
@@ -114,7 +118,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         locale={locale}
         body={cmsText(cms, "aboutIntro", locale, t("home.about.body"))}
         familyLine={cmsText(cms, "aboutFamilies", locale, t("home.about.families"))}
-        tutorLine={cmsText(cms, "aboutTutors", locale, t("home.about.tutors"))}
+        tutorLine={cmsText(cms, "aboutTutors", locale, t("home.about.tutors", { percent }))}
+        percent={percent}
       />
       <FaqSection locale={locale} />
       <BecomeTutorBand locale={locale} photoUrl={bandPhotoUrl()} />

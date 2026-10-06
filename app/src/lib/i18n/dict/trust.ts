@@ -34,7 +34,7 @@ export const trustCopy = {
     "about.tutors.title": "للكفاءات التعليمية البحرينية",
     "about.tutors.lead": "كيف تدعم المنصة من يعلّم:",
     "about.tutors.p1": "خريجو كليات المعلمين والمعلمون المؤهلون يصلون إلى أسر تبحث عن مدرس في منطقتها أو عبر الإنترنت.",
-    "about.tutors.p2": "الظهور في البحث باشتراك معلن، من دون اقتطاع نسبة من قيمة الحصة في هذه النسخة.",
+    "about.tutors.p2": "الظهور في البحث باشتراك معلن، إضافة إلى عمولة {percent}٪ تُخصم من قيمة كل حصة مكتملة.",
     "about.tutors.p3": "شارة التحقق ليست ديكورًا: تعني أن المؤهل والهوية راجعا يدويًا، وهي ما يميّز ملفك عن الإعلانات العشوائية.",
     "about.tutors.p4": "لوحة معلم كاملة: الطلبات، الجدولة، الأرباح المتوقعة، الاشتراك، والمستندات في مكان واحد.",
 
@@ -85,7 +85,7 @@ export const trustCopy = {
     "home.about.body":
       "نخدم عائلات تبحث عن معلم تثق به، وكفاءات بحرينية تعليمية تبحث عن دخل حقيقي من خبرتها. الاثنان في مكان واحد، بتحقق يدوي ودفع منظّم.",
     "home.about.families": "للعائلات: معلمون متحقق منهم وسعر واضح قبل الحجز.",
-    "home.about.tutors": "للمعلمين: ظهور باشتراك معلن دون نسبة من قيمة الحصة.",
+    "home.about.tutors": "للمعلمين: ظهور باشتراك معلن، إضافة إلى عمولة {percent}٪ من قيمة كل حصة مكتملة.",
     "home.about.link": "اقرأ المزيد عن إدورا",
     "home.guarantee.kicker": "الضمان",
     "home.guarantee.title": "ثلاث قواعد نبني عليها الثقة",
@@ -118,7 +118,7 @@ export const trustCopy = {
     "about.tutors.title": "For Bahraini teaching talent",
     "about.tutors.lead": "How the platform backs the people who teach:",
     "about.tutors.p1": "Graduates of teacher-training colleges and qualified educators reach families looking for a tutor in their area or online.",
-    "about.tutors.p2": "Listing is a published subscription, with no percentage taken from lesson fees in this version.",
+    "about.tutors.p2": "Listing is a published subscription, plus a {percent}% commission taken from each completed lesson.",
     "about.tutors.p3": "The verification badge is not decoration: it means qualification and identity were reviewed by hand, and it is what separates your profile from random classifieds.",
     "about.tutors.p4": "A full tutor dashboard: requests, scheduling, expected earnings, subscription and documents in one place.",
 
@@ -169,7 +169,7 @@ export const trustCopy = {
     "home.about.body":
       "We serve families looking for a tutor they can trust, and Bahraini education specialists looking for real income from their expertise. Both in one place, with hand verification and organised payment.",
     "home.about.families": "For families: verified tutors and a clear price before you book.",
-    "home.about.tutors": "For tutors: listing on a published subscription, with no cut of the lesson fee.",
+    "home.about.tutors": "For tutors: listing on a published subscription, plus a {percent}% commission on each completed lesson.",
     "home.about.link": "Read more about Edura",
     "home.guarantee.kicker": "Guarantee",
     "home.guarantee.title": "Three rules our trust is built on",

@@ -325,13 +325,17 @@ export function AboutTeaser({
   body,
   familyLine,
   tutorLine,
+  percent,
 }: {
   locale: Locale;
   body?: string;
   familyLine?: string;
   tutorLine?: string;
+  /** Platform commission, read from settings so the copy never drifts. */
+  percent?: number;
 }) {
   const t = createTranslator(locale);
+  const fallbackTutorLine = t("home.about.tutors", percent === undefined ? undefined : { percent });
   return (
     <section className="section" id="about">
       <div className="shell">
@@ -347,7 +351,7 @@ export function AboutTeaser({
               <p className="soft">{(familyLine ?? t("home.about.families")).trim()}</p>
             </Reveal>
             <Reveal index={2} className="card">
-              <p className="soft">{(tutorLine ?? t("home.about.tutors")).trim()}</p>
+              <p className="soft">{(tutorLine ?? fallbackTutorLine).trim()}</p>
             </Reveal>
             <div className="row">
               <Link className="btn btn--outline btn--sm" href={`/${locale}/about`}>
