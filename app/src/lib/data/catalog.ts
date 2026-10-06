@@ -61,7 +61,7 @@ export interface PlanData {
   code: string;
   name: string;
   price: string;
-  interval: "monthly" | "annual";
+  interval: "monthly" | "annual" | "one_time";
   durationDays: number;
   graceDays: number;
   features: string[];
@@ -78,7 +78,7 @@ export async function listPlans(locale: Locale): Promise<PlanData[]> {
       id: "demo-monthly",
       code: "monthly",
       name: locale === "ar" ? "شهري" : "Monthly",
-      price: "15.000",
+      price: "5.000",
       interval: "monthly",
       durationDays: 30,
       graceDays: 3,
@@ -89,17 +89,17 @@ export async function listPlans(locale: Locale): Promise<PlanData[]> {
       isDemo: true,
     },
     {
-      id: "demo-annual",
-      code: "annual",
-      name: locale === "ar" ? "سنوي" : "Annual",
-      price: "150.000",
-      interval: "annual",
-      durationDays: 365,
-      graceDays: 7,
+      id: "demo-one-time",
+      code: "one_time",
+      name: locale === "ar" ? "لمرة واحدة" : "One-time",
+      price: "30.000",
+      interval: "one_time",
+      durationDays: 36500,
+      graceDays: 0,
       features:
         locale === "ar"
-          ? ["كل مزايا الخطة الشهرية", "شهران مجانًا", "أولوية في الترتيب", "مراجعة المستندات بسرعة"]
-          : ["Everything in monthly", "Two months free", "Priority placement", "Faster document review"],
+          ? ["ظهور دائم في نتائج البحث", "صفحة معلم كاملة", "طلبات حجز غير محدودة", "دعم عبر واتساب"]
+          : ["Permanent search listing", "Full tutor profile", "Unlimited booking requests", "WhatsApp support"],
       isDemo: true,
     },
   ];

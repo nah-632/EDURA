@@ -162,9 +162,15 @@ export default async function TutorSubscriptionPage({ params }: { params: Promis
             <p className="plan__price">
               <span className="tnum">{formatMoney(plan.price, locale)}</span>{" "}
               <span className="field__hint">
-                / {plan.interval === "monthly" ? t("admin.plans.interval.monthly") : t("admin.plans.interval.annual")}
+                /{" "}
+                {plan.interval === "monthly"
+                  ? t("admin.plans.interval.monthly")
+                  : plan.interval === "one_time"
+                    ? t("admin.plans.interval.one_time")
+                    : t("admin.plans.interval.annual")}
               </span>
             </p>
+            {plan.interval === "one_time" ? <p className="field__hint">{t("pricing.oneTimeNote")}</p> : null}
             <ul className="plan__features">
               {plan.features.map((feature) => (
                 <li key={feature}>{feature}</li>

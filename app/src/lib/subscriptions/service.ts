@@ -31,7 +31,11 @@ export interface SubscriptionRecord extends SubscriptionShape {
 const SUBSCRIPTION_COLUMNS = `
   s.id, s.tutor_id as "tutorId", s.plan_id as "planId", s.status,
   s.starts_at as "startsAt", s.expires_at as "expiresAt", s.grace_until as "graceUntil",
-  p.name_ar as "planNameAr", p.name_en as "planNameEn", p.price as "planPrice",
+  p.name_ar as "planNameAr", p.name_en as "planNameEn",
+  -- Price snapshot: subscriptions.price is what the tutor was charged when the
+  -- subscription was requested. p.price is the CURRENT plan price and must not
+  -- leak into an existing subscription's display (or WhatsApp message).
+  s.price as "planPrice",
   p.interval as "planInterval", p.duration_days as "durationDays", p.grace_days as "graceDays",
   pay.status as "paymentStatus", pay.id as "paymentId", pay.reference_code as "paymentReference"
 `;

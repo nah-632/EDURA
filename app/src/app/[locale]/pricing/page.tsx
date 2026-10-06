@@ -83,10 +83,17 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
                 <header className="row row--between">
                   <strong style={{ fontSize: "1.1rem" }}>{plan.name}</strong>
                   <span className="chip chip--pale">
-                    {t(plan.interval === "monthly" ? "pricing.monthly" : "pricing.annual")}
+                    {t(
+                      plan.interval === "monthly"
+                        ? "pricing.monthly"
+                        : plan.interval === "one_time"
+                          ? "pricing.oneTime"
+                          : "pricing.annual",
+                    )}
                   </span>
                 </header>
                 <p className="plan__price tnum">{formatMoney(plan.price, locale)}</p>
+                {plan.interval === "one_time" ? <p className="field__hint">{t("pricing.oneTimeNote")}</p> : null}
                 <p className="field__hint">
                   {plan.durationDays} {locale === "ar" ? "يومًا" : "days"} · {plan.graceDays}{" "}
                   {locale === "ar" ? "أيام مهلة" : "days grace"}

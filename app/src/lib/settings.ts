@@ -44,6 +44,12 @@ export interface PlatformSettings {
   /** Launch offer: the first N tutors are not charged a subscription. */
   launchOfferEnabled: boolean;
   launchOfferTutorLimit: number;
+  /**
+   * Slice A+K: strict guardian-link enforcement. DATA, not config — read by
+   * the booking engine AND by the 0004 SQL trigger from this same settings
+   * row, so the two layers cannot disagree. Off = grace period.
+   */
+  guardianEnforcementStrict: boolean;
 }
 
 export const SETTINGS_KEY = "platform";
@@ -69,6 +75,7 @@ export function defaultSettings(): PlatformSettings {
     commissionPercent: 20,
     launchOfferEnabled: true,
     launchOfferTutorLimit: 15,
+    guardianEnforcementStrict: false,
   };
 }
 
@@ -119,6 +126,7 @@ export interface BookingSettings {
   maxAdvanceDays: number;
   cancellationHours: number;
   allowTutorDecline: boolean;
+  guardianEnforcementStrict: boolean;
 }
 
 export async function getBookingSettings(): Promise<BookingSettings> {
@@ -128,6 +136,7 @@ export async function getBookingSettings(): Promise<BookingSettings> {
     maxAdvanceDays: s.maxAdvanceDays,
     cancellationHours: s.cancellationHours,
     allowTutorDecline: s.allowTutorDecline,
+    guardianEnforcementStrict: s.guardianEnforcementStrict,
   };
 }
 

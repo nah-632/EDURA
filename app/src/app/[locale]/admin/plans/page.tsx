@@ -54,9 +54,10 @@ export default async function AdminPlansPage({ params }: { params: Promise<{ loc
             options: [
               { value: "monthly", label: t("admin.plans.interval.monthly") },
               { value: "annual", label: t("admin.plans.interval.annual") },
+              { value: "one_time", label: t("admin.plans.interval.one_time") },
             ],
           },
-          { kind: "number", name: "durationDays", label: t("admin.plans.durationDays"), required: true, min: 1, max: 730 },
+          { kind: "number", name: "durationDays", label: t("admin.plans.durationDays"), required: true, min: 1, max: 36500 },
           { kind: "number", name: "graceDays", label: t("admin.plans.graceDays"), value: 3, min: 0, max: 90 },
           { kind: "number", name: "sortOrder", label: t("admin.catalog.sort"), value: 0, min: 0, max: 999 },
           { kind: "checkbox", name: "isActive", label: t("admin.plans.active"), value: true },
@@ -92,7 +93,13 @@ export default async function AdminPlansPage({ params }: { params: Promise<{ loc
                 <td>
                   <Money value={plan.price} locale={locale} />
                 </td>
-                <td>{plan.interval === "monthly" ? t("admin.plans.interval.monthly") : t("admin.plans.interval.annual")}</td>
+                <td>
+                  {plan.interval === "monthly"
+                    ? t("admin.plans.interval.monthly")
+                    : plan.interval === "one_time"
+                      ? t("admin.plans.interval.one_time")
+                      : t("admin.plans.interval.annual")}
+                </td>
                 <td className="tnum">{plan.durationDays}</td>
                 <td className="tnum">{plan.graceDays}</td>
                 <td>
