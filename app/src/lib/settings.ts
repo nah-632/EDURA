@@ -13,7 +13,7 @@ export interface PlatformSettings {
   platformNameAr: string;
   platformNameEn: string;
   whatsappNumber: string | null;
-  benefitPayNumber: string;
+  benefitPayNumber: string | null;
   supportEmail: string;
   supportPhone: string;
   currency: "BHD";
@@ -59,7 +59,7 @@ export function defaultSettings(): PlatformSettings {
     platformNameAr: "إدورا",
     platformNameEn: "Edura",
     whatsappNumber: process.env.WHATSAPP_TARGET ?? null,
-    benefitPayNumber: process.env.BENEFITPAY_NUMBER ?? "+97366661238",
+    benefitPayNumber: process.env.BENEFITPAY_NUMBER ?? null,
     supportEmail: process.env.SUPPORT_EMAIL ?? "support@edura.world",
     supportPhone: process.env.SUPPORT_PHONE ?? process.env.WHATSAPP_TARGET ?? "",
     currency: "BHD",
