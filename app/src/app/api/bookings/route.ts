@@ -207,7 +207,7 @@ export async function POST(request: Request): Promise<Response> {
         code: created.code,
         status: created.status,
         amount: created.amount,
-        whatsappUrl: whatsappLink(process.env.WHATSAPP_TARGET ?? "+97366661238", message),
+        whatsappUrl: process.env.WHATSAPP_TARGET ? whatsappLink(process.env.WHATSAPP_TARGET, message) : null,
         message,
       },
       labels: { paymentInstruction: t("payment.instruction") },

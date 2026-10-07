@@ -8,7 +8,7 @@
  */
 import { formatDuration, formatMoney, formatTime, type Locale } from "@/lib/i18n";
 
-export const DEFAULT_WHATSAPP_NUMBER = "+97366661238";
+export const DEFAULT_WHATSAPP_NUMBER = "";
 
 export interface WhatsAppBookingView {
   code: string;

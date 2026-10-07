@@ -12,7 +12,7 @@ import type { GuaranteeConfig } from "@/lib/guarantee/rules";
 export interface PlatformSettings {
   platformNameAr: string;
   platformNameEn: string;
-  whatsappNumber: string;
+  whatsappNumber: string | null;
   benefitPayNumber: string;
   supportEmail: string;
   supportPhone: string;
@@ -58,10 +58,10 @@ export function defaultSettings(): PlatformSettings {
   return {
     platformNameAr: "إدورا",
     platformNameEn: "Edura",
-    whatsappNumber: process.env.WHATSAPP_TARGET ?? "+97366661238",
+    whatsappNumber: process.env.WHATSAPP_TARGET ?? null,
     benefitPayNumber: process.env.BENEFITPAY_NUMBER ?? "+97366661238",
     supportEmail: process.env.SUPPORT_EMAIL ?? "support@edura.world",
-    supportPhone: process.env.SUPPORT_PHONE ?? process.env.WHATSAPP_TARGET ?? "+97366661238",
+    supportPhone: process.env.SUPPORT_PHONE ?? process.env.WHATSAPP_TARGET ?? "",
     currency: "BHD",
     cancellationHours: 24,
     minLeadTimeHours: 12,
