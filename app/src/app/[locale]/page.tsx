@@ -48,7 +48,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   // the copy cannot drift from what the platform charges.
   const percent = settings.commissionPercent;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://edura.world";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const faq = [1, 2, 3, 4, 5].map((i) => ({
     question: t(`home.faq.q${i}` as never),
     answer: t(`home.faq.a${i}` as never),

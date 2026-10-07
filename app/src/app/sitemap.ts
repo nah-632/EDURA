@@ -16,7 +16,7 @@ import { locales } from "@/lib/i18n/types";
  * belong in `generateSitemaps` once there is real inventory, not guessed at
  * here.
  */
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://edura.world";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "";
 
 const PUBLIC_ROUTES = [
   { path: "", priority: 1.0, changeFrequency: "weekly" as const },

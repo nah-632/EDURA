@@ -8,7 +8,7 @@ import type { MetadataRoute } from "next";
  * checks the session server-side), but keeping them out of the index is still
  * the correct default for a platform holding tutor documents and family data.
  */
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://edura.world";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "";
 
 export default function robots(): MetadataRoute.Robots {
   return {

@@ -40,7 +40,7 @@ export default async function TutorProfilePage({
   if (!tutor) notFound();
 
   const [subjects, availability] = await Promise.all([listSubjects(locale), getTutorAvailability(tutor.id)]);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://edura.world";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
 
   const weekdayNames = [0, 1, 2, 3, 4, 5, 6].map((day) => t(`profile.weekday.${day}` as never));
 
